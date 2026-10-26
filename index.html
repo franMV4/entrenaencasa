@@ -150,11 +150,27 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-s
 .racts .btn.soft{font-size:1.05rem;gap:8px}
 .aviso{background:var(--accent-soft);box-shadow:none}
 .instalar{border:2px solid var(--line);box-shadow:none;background:transparent}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.tag{display:inline-flex;align-items:center;min-height:28px;padding:2px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.9rem;font-weight:700}
+.tag.gris{background:var(--bg-2);color:var(--muted)}
+.plan .ojo b{color:var(--accent)}
+.plan-ej summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--accent);font-weight:700;list-style:none}
+.plan-ej summary::-webkit-details-marker{display:none}
+.plan-ej summary::after{content:"";width:9px;height:9px;margin-left:10px;border:solid currentColor;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translateY(-3px);transition:transform .2s}
+.plan-ej[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.plan-ej .pasos{margin-top:6px}
+.consejos{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-1);padding:20px;display:grid;gap:14px}
+.consejos h2{font-size:1.3rem}
+.consejos-lista{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.consejos-lista li{display:flex;gap:12px;align-items:flex-start}
+.consejos-lista .ico{color:var(--ok);margin-top:.15em;stroke-width:2.6}
+.descanso-campo .field{border-top:0;padding-top:0}
 .pie-rut{justify-content:space-between;align-items:center}
 .sonido-btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;border-radius:999px;border:0;background:transparent;color:var(--muted);font-weight:700}
 .sonido-btn[aria-pressed="true"]{color:var(--accent)}
 .sonido-btn.compacto{width:52px;height:52px;padding:0;justify-content:center;background:var(--surface);box-shadow:var(--sh-1)}
-.ses-acc{display:flex;align-items:center;gap:10px}
+.ses-acc{display:flex;align-items:center;gap:8px;flex:none}
+.ses-acc .btn{padding-inline:18px}
 
 /* ---------- Editor de rutina ---------- */
 .volver{justify-self:start;margin-left:-6px;text-decoration:none}
@@ -267,10 +283,10 @@ dialog[open]::backdrop{animation:velo .32s ease-out}
 #entreno{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .ent{display:grid;gap:16px;justify-items:center;text-align:center;padding-block:24px 40px}
 .ent-fig{width:min(100%,50vh,30rem);aspect-ratio:1;background:var(--surface);border-radius:20px;overflow:hidden;box-shadow:var(--sh-1)}
-.ses{max-width:72rem;display:grid;gap:16px;padding-block:0 150px}
+.ses{max-width:72rem;display:grid;gap:16px;padding-block:0 calc(200px + env(safe-area-inset-bottom,0px))}
 .ses-top{position:sticky;top:0;z-index:3;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;box-shadow:0 1px 0 var(--line)}
 .ses-tit{display:grid;min-width:0}
-.ses-tit b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ses-tit b{line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
 .reloj-ses{font-weight:800;font-size:1.3rem;font-variant-numeric:tabular-nums}
 .tira{display:flex;gap:8px;overflow-x:auto;padding-block:2px 6px;scrollbar-width:none}
 .tira::-webkit-scrollbar{display:none}
@@ -285,6 +301,9 @@ dialog[open]::backdrop{animation:velo .32s ease-out}
 .series{display:grid;gap:6px;background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-1);padding:8px}
 .serie{display:grid;grid-template-columns:2rem minmax(0,1fr) minmax(0,4.8rem) minmax(0,4.8rem) 52px;gap:8px;align-items:center;padding:6px;border-radius:var(--r-s);transition:background-color .2s}
 .serie.sinpeso{grid-template-columns:2rem minmax(0,1fr) minmax(0,4.8rem) 52px}
+.serie.cab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.serie.cab span:first-child{text-align:center}
+@media (max-width:380px){.serie{grid-template-columns:1.6rem minmax(0,1fr) 4.3rem 4.3rem 48px;gap:6px}.serie.sinpeso{grid-template-columns:1.6rem minmax(0,1fr) 4.3rem 48px}.check{width:48px;height:48px}}
 .serie.cab{padding-block:4px 0;font-size:.85rem;font-weight:700;color:var(--muted)}
 .serie .n{font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
 .serie input{width:100%;height:52px;border-radius:var(--r-s);border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;font-size:1.2rem;font-weight:800;
@@ -356,6 +375,7 @@ dialog[open]::backdrop{animation:velo .32s ease-out}
 </div>
 <nav class="tabs" aria-label="Secciones">
   <button type="button" id="tab-rutinas"><span>Rutinas</span></button>
+  <button type="button" id="tab-planes"><span>Planes</span></button>
   <button type="button" id="tab-ejercicios"><span>Ejercicios</span></button>
   <button type="button" id="tab-historial"><span>Historial</span></button>
 </nav>
@@ -762,19 +782,19 @@ S.historial.forEach(e=>e.items.forEach(i=>{if(!Array.isArray(i.sets))i.sets=Arra
 if(S.sesion&&!(S.sesion.items||[]).every(i=>byId[i.id]))S.sesion=null;
 const save=()=>{S.historial.length=Math.min(S.historial.length,500);try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const rut=id=>S.rutinas.find(r=>r.id===id);
-function nuevaRutina(nombre,items=[]){const r={id:uid(),nombre,items};S.rutinas.push(r);save();return r}
+function nuevaRutina(nombre,items=[],descanso=60){const r={id:uid(),nombre,items,descanso};S.rutinas.push(r);save();return r}
 
 // ---------- Compartir: la rutina viaja dentro del enlace (#r-...) o como código para pegar ----------
 const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)));
-const codigo=r=>'r-'+b64e(JSON.stringify({n:r.nombre,i:r.items.map(i=>[i.id,i.series,i.reps,Math.round(i.kg*2)].join('.')).join('_')}));
+const codigo=r=>'r-'+b64e(JSON.stringify({n:r.nombre,d:r.descanso||60,i:r.items.map(i=>[i.id,i.series,i.reps,Math.round(i.kg*2)].join('.')).join('_')}));
 function leerCodigo(txt){
   const m=String(txt).match(/(?:^|[#\s])r-([A-Za-z0-9_-]{8,})/);if(!m)return null;
   try{
     const o=JSON.parse(b64d(m[1]));
     const items=String(o.i||'').split('_').map(s=>{const[id,se,re,kg]=s.split('.');
       return{id,series:num(+se,1,10,3),reps:num(+re,1,50,10),kg:num(+kg/2,0,40,0)}}).filter(i=>byId[i.id]);
-    return items.length?{nombre:String(o.n||'Rutina').trim().slice(0,60)||'Rutina',items}:null;
+    return items.length?{nombre:String(o.n||'Rutina').trim().slice(0,60)||'Rutina',items,descanso:num(+o.d,15,300,60)}:null;
   }catch{return null}
 }
 const base=()=>window.top!==window.self||!/^https?:$/.test(location.protocol)?ARTIFACT:location.origin+location.pathname;
@@ -804,7 +824,8 @@ const ICOS={
   reloj:'M12 7.5V12l3 2M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z',cerrar:'M6 6l12 12M18 6 6 18',subir:'M12 19V5M6 11l6-6 6 6',
   descargar:'M12 3.5V15M7.5 10.5 12 15l4.5-4.5M5 19.5h14',
   sonido:'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
-  mudo:'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5'};
+  mudo:'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5',
+  planes:'M9 4.5h6M9 4.5a1.5 1.5 0 0 0 0 3h6a1.5 1.5 0 0 0 0-3M9 4.5H7A1.5 1.5 0 0 0 5.5 6v13A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 17 4.5h-2M9 13.5l2 2 4-4'};
 function ico(n){const s=el('svg',{viewBox:'0 0 24 24',class:n==='play'?'ico fill':'ico','aria-hidden':'true'});el('path',{d:ICOS[n]},s);return s}
 function stepper(label,val,step,min,max,fmt,onChange){
   let v=val;
@@ -829,7 +850,9 @@ function dosVeces(label,accion){
   }},label);
 }
 const figBox=(ex,o={})=>h('div',{class:'figbox'},figure(ex,{play:!QUIETO,e:QUIETO?HOLD+dur(ex)+.1:Math.random()*cycle(ex),...o}).node);
-const minutos=items=>Math.max(1,Math.round(items.reduce((t,i)=>t+i.series*(i.reps*3+60),0)/60));
+const minutos=(items,d=60)=>Math.max(1,Math.round(items.reduce((t,i)=>t+i.series*(i.reps*3+d),0)/60));
+const descTxt=s=>s<60?`${s} segundos`:s%60?`${Math.floor(s/60)} min y ${s%60} s`:plural(s/60,'minuto','minutos');
+const descCorto=s=>s<60?`${s} s`:`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} min`;
 const kgN=v=>String(v).replace('.',',');
 const serieTxt=z=>z.kg?`${z.reps} × ${kgN(z.kg)} kg`:`${z.reps} rep.`;
 function setsTxt(sets){const t=sets.map(serieTxt);return t.every(x=>x===t[0])?`${plural(t.length,'serie','series')} de ${t[0]}`:t.join(', ')}
@@ -842,12 +865,12 @@ function fecha(ts){
 function resumen(r){
   if(!r.items.length)return'Sin ejercicios todavía.';
   const e=S.historial.find(x=>x.rid===r.id);
-  return`${plural(r.items.length,'ejercicio','ejercicios')}, unos ${minutos(r.items)} minutos.`+(e?` Último entreno: ${fecha(e.t)}.`:'');
+  return`${plural(r.items.length,'ejercicio','ejercicios')}, unos ${minutos(r.items,r.descanso||60)} minutos.`+(e?` Último entreno: ${fecha(e.t)}.`:'');
 }
 
 // ---------- Navegación ----------
 const main=document.getElementById('main'),dlg=document.getElementById('ficha');
-const tabs={rutinas:document.getElementById('tab-rutinas'),ejercicios:document.getElementById('tab-ejercicios'),historial:document.getElementById('tab-historial')};
+const tabs={rutinas:document.getElementById('tab-rutinas'),planes:document.getElementById('tab-planes'),ejercicios:document.getElementById('tab-ejercicios'),historial:document.getElementById('tab-historial')};
 let vista='rutinas',editando=null;
 function show(v,id=null){vista=v;editando=id;render();try{history.replaceState(null,'','#'+v)}catch{}window.scrollTo(0,0)}
 for(const[v,b]of Object.entries(tabs)){b.onclick=()=>show(v);b.prepend(ico(v))}
@@ -855,7 +878,7 @@ document.getElementById('marca').append(ico('ejercicios'));
 function render(){
   for(const[v,b]of Object.entries(tabs))b.setAttribute('aria-pressed',vista===v);
   const r=editando&&rut(editando);
-  main.replaceChildren(vista==='ejercicios'?vistaEjercicios():vista==='historial'?vistaHistorial():r?vistaEditor(r):vistaRutinas());
+  main.replaceChildren(vista==='planes'?vistaPlanes():vista==='ejercicios'?vistaEjercicios():vista==='historial'?vistaHistorial():r?vistaEditor(r):vistaRutinas());
 }
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 dlg.addEventListener('close',render);
@@ -918,13 +941,14 @@ function vistaEditor(r){
           h('label',{class:'lab',for:'nombre-rutina'},'Nombre de la rutina'),
           h('input',{id:'nombre-rutina',class:'nombre',value:r.nombre,maxlength:60,autocomplete:'off',oninput(){r.nombre=this.value.trim()||'Sin nombre';save()}}),
           h('p',{class:'meta'},ico('reloj'),metaTxt),
+          h('div',{class:'fields descanso-campo'},stepper('Descanso entre series',r.descanso||60,15,15,300,descCorto,x=>{r.descanso=x;save();metaTxt.textContent=resumen(r)})),
           items.length>0&&h('div',{class:'racts'},
             h('button',{class:'btn primary big',type:'button',onclick:()=>empezar(r)},ico('play'),'Empezar'),
             h('button',{class:'btn soft',type:'button',onclick:()=>compartir(r)},ico('compartir'),'Compartir'))),
         h('section',{class:'ed-bottom'},
           h('div',{class:'row'},
             h('button',{class:items.length?'btn soft':'btn primary',type:'button',onclick:()=>elegir(r)},ico('mas'),'Añadir ejercicios'),
-            h('button',{class:'btn ghost',type:'button',onclick(){const c=nuevaRutina(`${r.nombre} (copia)`,items.map(i=>({...i})));show('rutinas',c.id)}},'Duplicar')),
+            h('button',{class:'btn ghost',type:'button',onclick(){const c=nuevaRutina(`${r.nombre} (copia)`,items.map(i=>({...i})),r.descanso);show('rutinas',c.id)}},'Duplicar')),
           h('div',{},dosVeces('Borrar esta rutina',()=>{S.rutinas=S.rutinas.filter(x=>x!==r);save();show('rutinas')})))),
       h('div',{class:'ed-list'},items.length?h('ol',{class:'lista'},items.map((it,idx)=>{
         const ex=byId[it.id];
@@ -953,6 +977,83 @@ function sugerir(r,it,ex){
   const txt=n.kg!=null?`${kgTxt(n.kg)} y ${n.reps} repeticiones`:n.reps!=null?`${n.reps} repeticiones`:`${n.series} series`;
   return h('div',{class:'sube'},h('span',{class:'muted small'},'La última vez lo hiciste todo.'),
     h('button',{type:'button',onclick(){Object.assign(it,n);save();render()}},`Subir a ${txt}`));
+}
+
+// ---------- Planes: rutinas de entrenador para personas de 50 años en adelante, en casa ----------
+// Criterios: 2–3 días por semana, cuerpo entero, ejercicios funcionales (levantarse, subir escalones, cargar),
+// equilibrio y espalda; poco impacto; progresión por repeticiones y luego peso. Ejercicio: [id, series, repeticiones, kg]
+const PLANES=[
+ {id:'primeros',grupo:'Para empezar',nombre:'Primeros pasos',nivel:'Iniciación',cuando:'2 días por semana',descanso:75,
+  objetivo:'Para quien no ha entrenado nunca o vuelve después de mucho tiempo. Todo se hace con apoyo y sin peso: lo importante es aprender bien cada movimiento.',
+  consejo:'Haz esta rutina dos o tres semanas. Cuando la termines con soltura, pasa a «Cuerpo entero A» y «Cuerpo entero B».',
+  items:[['silla',2,8,0],['pared',2,10,0],['puente',2,10,0],['extrodilla',2,10,0],['talones',2,12,0],['superman',2,6,0]]},
+ {id:'expres',grupo:'Para empezar',nombre:'Exprés de 15 minutos',nivel:'Iniciación',cuando:'Los días con poco tiempo',descanso:45,
+  objetivo:'Cinco ejercicios que mueven todo el cuerpo para los días con poco tiempo o pocas ganas.',
+  consejo:'Más vale 15 minutos hoy que una hora que nunca llega. Si un día estás cansado, hazla sin peso.',
+  items:[['silla',2,10,0],['pared',2,12,0],['remo',2,12,1.5],['puente',2,12,0],['talones',2,15,0]]},
+ {id:'cuerpoA',grupo:'Para seguir progresando',nombre:'Cuerpo entero A',nivel:'Base',cuando:'2 días por semana, alternando con la B',descanso:90,
+  objetivo:'La rutina principal: piernas, empuje, tirón y abdomen en cada sesión. Altérnala con la B, por ejemplo lunes la A y jueves la B.',
+  consejo:'Elige un peso con el que las dos últimas repeticiones cuesten, pero salgan bien. Cuando todas te resulten fáciles, la app te propondrá subir.',
+  items:[['goblet',3,10,3],['mesa',3,10,0],['rumano',3,10,3],['remo1',3,10,3],['press',2,10,2],['crunch',2,10,0]]},
+ {id:'cuerpoB',grupo:'Para seguir progresando',nombre:'Cuerpo entero B',nivel:'Base',cuando:'2 días por semana, alternando con la A',descanso:90,
+  objetivo:'La pareja de la A: trabaja los mismos músculos con otros ejercicios, desde otro ángulo.',
+  consejo:'Deja al menos un día de descanso entre la A y la B. El músculo se fortalece mientras descansas.',
+  items:[['escalon',3,8,0],['presuelo',3,10,3],['puentepeso',3,12,5],['remo',3,10,3],['curl',2,10,2],['patada',2,10,1.5],['rodillasup',2,10,0]]},
+ {id:'fuerza',grupo:'Para seguir progresando',nombre:'Fuerza a fondo',nivel:'Avanzado',cuando:'2 o 3 días por semana',descanso:90,
+  objetivo:'Para quien ya lleva meses entrenando: menos repeticiones y más peso para seguir ganando fuerza y proteger los huesos.',
+  consejo:'Antes de cada ejercicio haz una serie suave para calentar. Nunca sacrifiques la técnica por subir peso.',
+  items:[['goblet',4,8,6],['rumano',4,8,6],['rodillas',3,8,0],['remo1',4,8,5],['escalon',3,10,2],['press',3,8,3]]},
+ {id:'equilibrio',grupo:'Con un objetivo',nombre:'Piernas fuertes y equilibrio',nivel:'Todos los niveles',cuando:'2 días por semana',descanso:75,
+  objetivo:'Para caminar con más seguridad, subir escaleras sin esfuerzo y prevenir caídas.',
+  consejo:'Haz los ejercicios de pie junto a una silla o la encimera. Cuando te sientas firme, apóyate solo con la punta de los dedos.',
+  items:[['silla',3,10,0],['escalon',3,8,0],['talones',3,15,0],['patgluteo',2,12,0],['zancada',2,8,0],['extrodilla',2,12,0]]},
+ {id:'espalda',grupo:'Con un objetivo',nombre:'Espalda sana y buena postura',nivel:'Todos los niveles',cuando:'2 o 3 días por semana',descanso:60,
+  objetivo:'Para quien pasa muchas horas sentado: fortalece la espalda y abre el pecho para ir más derecho.',
+  consejo:'En los remos, junta los omóplatos al final de cada repetición, como si quisieras sujetar un lápiz entre ellos.',
+  items:[['remo1',3,12,2],['superman',3,8,0],['pullover',2,12,2],['frontal',2,10,1],['puente',3,12,0],['rumano',2,12,2]]},
+ {id:'brazos',grupo:'Con un objetivo',nombre:'Brazos y hombros para el día a día',nivel:'Todos los niveles',cuando:'2 días por semana',descanso:60,
+  objetivo:'Para llevar la compra, coger en brazos a los nietos o colocar cosas en un estante alto sin esfuerzo.',
+  consejo:'Sube y baja las pesas despacio, contando dos segundos al bajar. Nada de balancear el cuerpo.',
+  items:[['curl',3,10,2],['martillo',2,10,2],['press',3,10,2],['nuca',2,10,2],['fondos',2,8,0],['frontal',2,10,1]]},
+ {id:'abdomen',grupo:'Con un objetivo',nombre:'Abdomen y zona lumbar',nivel:'Todos los niveles',cuando:'2 o 3 días por semana',descanso:45,
+  objetivo:'Un tronco fuerte protege la espalda y mejora el equilibrio, sin abdominales bruscos.',
+  consejo:'Suelta el aire al subir. Si notas tirones en el cuello, apoya la cabeza y haz menos recorrido.',
+  items:[['crunch',3,10,0],['rodillasup',3,10,0],['superman',3,8,0],['puente',3,12,0]]}];
+const GRUPOS_PLAN=['Para empezar','Para seguir progresando','Con un objetivo'];
+const CONSEJOS=['Entrena 2 o 3 días por semana, con un día de descanso entre medias.',
+  'Calienta 5 minutos antes: marcha en el sitio y haz círculos con los hombros y los tobillos.',
+  'La última repetición de cada serie debe costar, pero tienes que poder hacerla bien.',
+  'Cansancio en el músculo, sí; dolor en las articulaciones, no. Si algo duele, para.',
+  'No aguantes la respiración: suelta el aire al hacer el esfuerzo y bebe agua.',
+  'Si tienes una lesión, problemas de corazón o tensión alta, consulta antes con tu médico.'];
+function vistaPlanes(){
+  return h('div',{class:'stack'},
+    h('section',{class:'intro'},h('h1',{},'Planes'),
+      h('p',{class:'muted'},'Rutinas preparadas por un entrenador para hacer en casa a partir de los 50 años. Guarda la que te encaje y ajústala a tu gusto.')),
+    h('section',{class:'consejos'},h('h2',{},'Antes de empezar'),
+      h('ul',{class:'consejos-lista'},CONSEJOS.map(c=>h('li',{},ico('check'),h('span',{},c))))),
+    GRUPOS_PLAN.map(g=>h('section',{class:'stack-s'},h('h2',{},g),
+      h('div',{class:'rutinas'},PLANES.filter(p=>p.grupo===g).map(tarjetaPlan)))));
+}
+function tarjetaPlan(p){
+  const items=p.items.map(([id,series,reps,kg])=>({id,series,reps,kg})),n=items.length,muestra=n>4?items.slice(0,3):items;
+  const estado=h('p',{class:'ok-txt','aria-live':'polite'});
+  const guardar=()=>nuevaRutina(p.nombre,items.map(i=>({...i})),p.descanso);
+  return h('article',{class:'rcard plan'},
+    h('div',{class:'minis','aria-hidden':'true'},muestra.map(i=>figBox(byId[i.id],{play:false,e:HOLD+dur(byId[i.id])+.1})),n>4&&h('span',{class:'mas-n'},`+${n-3}`)),
+    h('div',{class:'rbody'},
+      h('div',{class:'tags'},h('span',{class:'tag'},p.nivel),h('span',{class:'tag gris'},p.cuando)),
+      h('h3',{class:'rname'},p.nombre),
+      h('p',{},p.objetivo),
+      h('p',{class:'meta'},ico('reloj'),h('span',{},`${plural(n,'ejercicio','ejercicios')}, unos ${minutos(items,p.descanso)} minutos. Descanso de ${descTxt(p.descanso)}.`))),
+    h('p',{class:'ojo'},h('b',{},'Consejo: '),p.consejo),
+    h('details',{class:'plan-ej'},h('summary',{},'Ver los ejercicios'),
+      h('ol',{class:'pasos'},items.map(i=>h('li',{},h('b',{},byId[i.id].nombre),`: ${plural(i.series,'serie','series')} de ${i.reps}`+(i.kg?`, ${kgTxt(i.kg)}`:''))))),
+    h('div',{class:'racts'},
+      h('button',{class:'btn primary',type:'button',onclick(){guardar();sonar('pop');
+        estado.replaceChildren('Guardada en tus rutinas. ',h('button',{class:'link',type:'button',onclick:()=>show('rutinas')},'Ver mis rutinas'))}},ico('mas'),'Guardar en mis rutinas'),
+      h('button',{class:'btn soft',type:'button',onclick:()=>empezar(guardar())},ico('play'),'Empezar ahora')),
+    estado);
 }
 
 // ---------- Ejercicios ----------
@@ -1051,7 +1152,7 @@ function compartir(r){
 }
 function guardarImport(d){
   const ya=S.rutinas.find(r=>codigo(r)===codigo(d));
-  const r=ya||nuevaRutina(d.nombre,d.items);
+  const r=ya||nuevaRutina(d.nombre,d.items,d.descanso);
   dlg.close();show('rutinas',r.id);
 }
 function pegarCodigo(){
@@ -1111,7 +1212,6 @@ function entrada(e){
 // La sesión vive en S.sesion y se guarda con cada cambio, así sobrevive a recargar o bloquear el móvil.
 const ent=document.getElementById('entreno');
 let E=null,ac=null,lock=null,tic=null,rest=null,reloj=null;
-const DESCANSO=60;
 // Sonidos sintetizados con Web Audio (sin archivos): notas de campanilla [frecuencia Hz, inicio s, duración s]
 const SONIDOS={
   empezar:[[523,0],[659,.09],[784,.18],[1047,.27,.35]],
@@ -1142,7 +1242,7 @@ const vibrar=ms=>{try{S.mudo||navigator.vibrate&&navigator.vibrate(ms)}catch{}};
 // Interruptor de sonido (se recuerda en este dispositivo)
 function botonSonido(compacto){
   const b=h('button',{class:'sonido-btn'+(compacto?' compacto':''),type:'button',onclick(){S.mudo=!S.mudo;save();pintar();sonar('pop')}});
-  const pintar=()=>{b.replaceChildren(ico(S.mudo?'mudo':'sonido'),!compacto&&(S.mudo?'Sonidos desactivados':'Sonidos activados'));
+  const pintar=()=>{b.replaceChildren(ico(S.mudo?'mudo':'sonido'),...(compacto?[]:[S.mudo?'Sonidos desactivados':'Sonidos activados']));
     b.setAttribute('aria-pressed',String(!S.mudo));b.setAttribute('aria-label',S.mudo?'Activar sonidos':'Silenciar sonidos')};
   pintar();return b;
 }
@@ -1151,7 +1251,7 @@ const contar=it=>`${it.sets.filter(z=>z.done).length}/${it.sets.length}`;
 function anterior(id){const e=S.historial.find(x=>x.items.some(i=>i.id===id));return e?e.items.find(i=>i.id===id).sets:[]}
 function empezar(r){
   const nueva=()=>{
-    S.sesion={rid:r.id,nombre:r.nombre,t0:Date.now(),i:0,items:r.items.map(it=>({id:it.id,
+    S.sesion={rid:r.id,nombre:r.nombre,t0:Date.now(),i:0,descanso:r.descanso||60,items:r.items.map(it=>({id:it.id,
       sets:Array.from({length:it.series},()=>({kg:byId[it.id].peso===false?0:it.kg,reps:it.reps,done:false}))}))};
     save();abrirSesion();
   };
@@ -1202,7 +1302,7 @@ function filaSerie(it,z,k,a,conPeso,tira){
     h('button',{class:'check',type:'button','aria-pressed':String(z.done),'aria-label':`Serie ${k+1} hecha`,onclick(){
       z.done=!z.done;fila.classList.toggle('hecha',z.done);this.setAttribute('aria-pressed',String(z.done));save();
       const b=tira.children[E.i];b.querySelector('small').textContent=contar(it);b.classList.toggle('ok',it.sets.every(x=>x.done));
-      if(z.done){rest={until:Date.now()+DESCANSO*1e3,total:DESCANSO};pintarDescanso(DESCANSO);sonar(it.sets.every(x=>x.done)?'ejercicio':'hecha');vibrar(30)}
+      if(z.done){const d=E.descanso||60;rest={until:Date.now()+d*1e3,total:d};pintarDescanso(d);sonar(it.sets.every(x=>x.done)?'ejercicio':'hecha');vibrar(30)}
       else sonar('quitar');
     }},ico('check')));
   return fila;
@@ -1224,7 +1324,7 @@ function pintarSesion(){
     h('div',{class:'ses-head'},h('h2',{},x.nombre),h('button',{class:'link',type:'button',onclick:()=>ficha(x,{solo:true})},'Cómo se hace'))),
     h('div',{class:'ses-sets'},
     h('div',{class:'series'},
-      h('div',{class:'serie cab'+(conPeso?'':' sinpeso'),'aria-hidden':'true'},h('span',{},'Serie'),h('span',{},'Anterior'),conPeso&&h('span',{},'kg'),h('span',{},'Reps'),h('span',{},'Hecha')),
+      h('div',{class:'serie cab'+(conPeso?'':' sinpeso'),'aria-hidden':'true'},h('span',{},'Nº'),h('span',{},'Antes'),conPeso&&h('span',{},'kg'),h('span',{},'Reps'),h('span',{},'Hecha')),
       it.sets.map((z,k)=>filaSerie(it,z,k,ant[k],conPeso,tira))),
     h('div',{class:'row'},
       h('button',{class:'btn ghost',type:'button',onclick(){const u=it.sets[it.sets.length-1]||{kg:0,reps:10};it.sets.push({kg:u.kg,reps:u.reps,done:false});save();pintarSesion()}},ico('mas'),'Añadir serie'),
@@ -1298,7 +1398,7 @@ function avisoInstalar(){
 
 // ---------- Arranque ----------
 const hs=location.hash.slice(1);
-if(['ejercicios','historial'].includes(hs))vista=hs;
+if(['planes','ejercicios','historial'].includes(hs))vista=hs;
 render();
 if(hs.startsWith('r-')){try{history.replaceState(null,'','#rutinas')}catch{}ofrecerImport(leerCodigo('#'+hs))}
 </script>
