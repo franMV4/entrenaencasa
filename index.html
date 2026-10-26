@@ -118,9 +118,6 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-s
 .fig .propfill{fill:var(--prop)}
 
 /* ---------- Rutinas ---------- */
-.hero{display:grid;gap:24px;align-items:center}
-.hero .figbox{background:var(--surface);border-radius:20px;width:100%;max-width:26rem;box-shadow:var(--sh-2)}
-.hero-txt{display:grid;gap:16px}
 .rutinas{display:grid;gap:16px}
 .rcard{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-1);padding:16px;display:grid;gap:16px;align-content:start}
 .minis{display:flex;gap:8px;padding:10px;background:var(--bg-2);border-radius:var(--r-s);min-height:84px;align-items:center}
@@ -336,7 +333,6 @@ h1{font-size:clamp(2.3rem,6.5vw,3.4rem);letter-spacing:-.03em}
 .card{border-color:transparent;background:var(--surface)}
 .minis{background:var(--bg-2)}
 .figbox,.ficha-fig,.ent-fig{background:radial-gradient(120% 95% at 50% 28%,color-mix(in srgb,var(--z,var(--accent2)) 42%,var(--surface)),color-mix(in srgb,var(--z,var(--accent2)) 7%,var(--bg-2)) 74%)} /* foco de escenario detrás del maniquí */
-.hero .figbox{background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
 .mas-n{background:var(--surface-2);color:var(--ink)}
 .tag{background:var(--accent-soft);color:var(--accent)}
 .tag.gris{background:var(--accent2-soft);color:var(--accent2)}
@@ -390,9 +386,6 @@ dialog::backdrop{background:rgb(4 5 14 / .72)}
 .serie input{font-size:1.25rem}
 
 /* ---------- Tablet y pantallas grandes ---------- */
-@media (min-width:44rem){
-  .hero{grid-template-columns:1fr 1fr;gap:40px}
-}
 @media (min-width:720px){
   .wrap{max-width:62rem;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));padding-top:28px}
   .salto{margin-inline:-32px;padding-inline:32px}
@@ -970,27 +963,25 @@ function semanaMini(){
 }
 function saludo(){const hr=new Date().getHours();return hr>=6&&hr<14?'Buenos días':hr>=14&&hr<21?'Buenas tardes':'Buenas noches'}
 function vistaRutinas(){
-  if(!S.rutinas.length)return h('div',{class:'stack'},avisoSesion(),h('section',{class:'hero'},
-    figBox(byId.sentadilla,{play:true,girar:true}),
-    h('div',{class:'hero-txt'},
-      h('h1',{},'Aún no tienes rutinas'),
-      h('p',{class:'muted'},'Crea una eligiendo ejercicios, empieza con una sencilla ya preparada o pega el código que te hayan enviado.'),
-      h('div',{class:'row'},
-        h('button',{class:'btn primary',type:'button',onclick:()=>show('planes')},ico('planes'),'Ver rutinas del entrenador'),
-        h('button',{class:'btn ghost',type:'button',onclick:crear},'Crear una rutina')),
-      h('div',{},h('button',{class:'link',type:'button',onclick:pegarCodigo},'Tengo un código')))));
   const hoy=new Date(),lunes=new Date(hoy);lunes.setHours(0,0,0,0);lunes.setDate(lunes.getDate()-(lunes.getDay()+6)%7);
-  const semana=S.historial.filter(e=>e.t>=+lunes).length;
+  const semana=S.historial.filter(e=>e.t>=+lunes).length,hay=S.rutinas.length>0;
   return h('div',{class:'stack'},
     h('section',{class:'intro'},
       h('p',{class:'fecha'},cap(hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}))),
       h('h1',{},saludo()),
-      h('p',{class:'muted'},semana?`Esta semana llevas ${plural(semana,'entreno','entrenos')}. ¡Sigue así!`:'Esta semana aún no has entrenado. Elige una rutina y empieza cuando quieras.'),
+      h('p',{class:'muted'},semana?`Esta semana llevas ${plural(semana,'entreno','entrenos')}. ¡Sigue así!`
+        :hay?'Esta semana aún no has entrenado. Elige una rutina y empieza cuando quieras.':'Esta semana aún no has entrenado. Empieza con una rutina del entrenador o crea la tuya.'),
       semanaMini()),
     avisoSesion(),
     h('section',{class:'stack-s'},
-      h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
-      h('div',{class:'rutinas'},S.rutinas.map(tarjetaRutina))),
+      h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),hay&&h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
+      hay?h('div',{class:'rutinas'},S.rutinas.map(tarjetaRutina))
+        :h('article',{class:'rcard vacia'},
+          h('div',{class:'rbody'},h('h3',{class:'rname'},'Aún no tienes rutinas'),
+            h('p',{class:'muted'},'Guarda una de las rutinas del entrenador, crea la tuya eligiendo ejercicios o pega el código que te hayan enviado.')),
+          h('div',{class:'racts'},
+            h('button',{class:'btn primary',type:'button',onclick:()=>show('planes')},ico('planes'),'Ver rutinas del entrenador'),
+            h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Crear una rutina')))),
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Rutinas del entrenador'),h('button',{class:'link',type:'button',onclick:()=>show('planes')},'Ver todas')),
       h('p',{class:'muted'},'Preparadas para hacer en casa a partir de los 50 años. Toca una para verla y guardarla.'),
