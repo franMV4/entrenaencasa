@@ -8,9 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="EntrenaEnCasa">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#ECEEF2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#141824" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F1020">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,36 +18,22 @@
 <style>
 /* Misma identidad (gris azulado, cobalto, Atkinson, maniquí de madera) con más profundidad,
    navegación al alcance del pulgar y dos columnas en tablet. */
+/* Noche vibrante: lienzo índigo casi negro. Lima = acción principal y «hecho»; violeta = secundario y selección;
+   cada zona del cuerpo tiene su color para orientarse (tiñe el escenario del maniquí). */
 :root{
-  --bg:#ECEEF2; --bg-2:#E2E6EE; --surface:#FFFFFF; --surface-2:#F3F5F9;
-  --ink:#1C2232; --muted:#535E71; --line:#D6DAE3;
-  --accent:#2C4FCB; --accent-hover:#2343B2; --accent-ink:#FFFFFF; --accent-soft:#E3E9FB;
-  --wood:#D9A46E; --wood-far:#BC8858; --joint:#94622F; --prop:#A3AAB8; --floor:#C9CFDA; --mat:#C8D3F5;
-  --ok:#1F7F55; --ok-ink:#FFFFFF; --ok-soft:#DCF1E6; --danger:#B42318;
-  --sh-1:0 1px 2px rgb(24 32 56 / .06),0 3px 10px rgb(24 32 56 / .05);
-  --sh-2:0 2px 6px rgb(24 32 56 / .07),0 16px 36px rgb(24 32 56 / .11);
-  --sh-btn:0 1px 2px rgb(24 40 120 / .18),0 6px 16px rgb(44 79 203 / .24);
-  --r:16px; --r-s:12px; --nav-h:76px;
+  --bg:#0F1020; --bg-2:#15172B; --surface:#1A1C33; --surface-2:#23264A; --line:#2F3360;
+  --ink:#F3F4FF; --muted:#A7ABD0;
+  --accent:#C6F432; --accent-hover:#D7FF5E; --accent-ink:#11130A; --accent-soft:#2A3519;
+  --accent2:#9D8FFF; --accent2-ink:#0F1020; --accent2-soft:#2A2758;
+  --wood:#DDAA76; --wood-far:#A8784C; --joint:#8A5A2C; --prop:#565C98; --floor:#2C3060; --mat:#3A3478; --db:#9D8FFF;
+  --ok:#C6F432; --ok-ink:#11130A; --ok-soft:#263117; --danger:#FF7389;
+  --sh-1:0 1px 2px rgb(0 0 0 / .35),0 8px 20px rgb(0 0 0 / .22);
+  --sh-2:0 2px 6px rgb(0 0 0 / .4),0 20px 44px rgb(0 0 0 / .45);
+  --sh-btn:0 2px 4px rgb(0 0 0 / .3),0 8px 22px rgb(198 244 50 / .22);
+  --r:18px; --r-s:12px; --nav-h:76px;
   --font:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#141824; --bg-2:#181D2A; --surface:#1F2433; --surface-2:#272D3E;
-  --ink:#E9ECF3; --muted:#A5ADBE; --line:#333B4F;
-  --accent:#8EA5FF; --accent-hover:#A7B9FF; --accent-ink:#0F1528; --accent-soft:#283258;
-  --wood:#DDAA76; --wood-far:#A8784C; --joint:#8A5A2C; --prop:#5F6779; --floor:#3A4256; --mat:#2E3960;
-  --ok:#5CC796; --ok-ink:#0E1A14; --ok-soft:#1C3A2D; --danger:#FF8A7A;
-  --sh-1:0 1px 2px rgb(0 0 0 / .3),0 4px 12px rgb(0 0 0 / .22);
-  --sh-2:0 2px 6px rgb(0 0 0 / .35),0 18px 40px rgb(0 0 0 / .4);
-  --sh-btn:0 1px 2px rgb(0 0 0 / .3),0 6px 16px rgb(0 0 0 / .3); color-scheme:dark }}
-:root[data-theme="dark"]{
-  --bg:#141824; --bg-2:#181D2A; --surface:#1F2433; --surface-2:#272D3E;
-  --ink:#E9ECF3; --muted:#A5ADBE; --line:#333B4F;
-  --accent:#8EA5FF; --accent-hover:#A7B9FF; --accent-ink:#0F1528; --accent-soft:#283258;
-  --wood:#DDAA76; --wood-far:#A8784C; --joint:#8A5A2C; --prop:#5F6779; --floor:#3A4256; --mat:#2E3960;
-  --ok:#5CC796; --ok-ink:#0E1A14; --ok-soft:#1C3A2D; --danger:#FF8A7A;
-  --sh-1:0 1px 2px rgb(0 0 0 / .3),0 4px 12px rgb(0 0 0 / .22);
-  --sh-2:0 2px 6px rgb(0 0 0 / .35),0 18px 40px rgb(0 0 0 / .4);
-  --sh-btn:0 1px 2px rgb(0 0 0 / .3),0 6px 16px rgb(0 0 0 / .3); color-scheme:dark }
 
 /* ---------- Base ---------- */
 *{box-sizing:border-box}
@@ -77,7 +62,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-s
 .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
 .marca-app{width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:var(--sh-btn)}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:4px;background:var(--surface);
-  box-shadow:0 -1px 0 var(--line),0 -10px 28px rgb(24 32 56 / .07);
+  box-shadow:0 -1px 0 var(--line),0 -12px 30px rgb(0 0 0 / .35);
   padding:8px max(12px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .tabs button{flex:1;min-height:60px;border:0;background:none;color:var(--muted);display:grid;justify-items:center;align-content:center;gap:2px;font-size:.95rem;font-weight:700;border-radius:16px}
 .tabs .ico{width:60px;height:34px;padding:5px 18px;border-radius:999px;transition:background-color .2s,color .2s}
@@ -122,7 +107,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-s
 .fig .far{stroke:var(--wood-far);fill:var(--wood-far)}
 .fig .joint{fill:var(--joint)}
 .fig .fj{fill:var(--joint);opacity:.6}
-.fig .db{fill:var(--ink)}
+.fig .db{fill:var(--db)}
 .fig .dbin{fill:var(--prop)}
 .fig .floor{fill:var(--floor)}
 .fig .mat{fill:var(--mat)}
@@ -335,6 +320,69 @@ dialog[open]::backdrop{animation:velo .32s ease-out}
 .d-txt{flex:1;font-weight:800;font-size:1.2rem;font-variant-numeric:tabular-nums}
 .bar-btn{min-height:48px;padding:0 16px;border-radius:999px;border:2px solid currentColor;background:transparent;color:inherit;font-weight:700}
 
+/* ---------- Noche vibrante: color con significado ---------- */
+h1{font-size:clamp(2.3rem,6.5vw,3.4rem);letter-spacing:-.03em}
+.fecha{color:var(--accent);letter-spacing:.01em}
+.marca-app{background:var(--accent);color:var(--accent-ink);box-shadow:var(--sh-btn)}
+.tabs button[aria-pressed="true"]{color:var(--ink)}
+.tabs button[aria-pressed="true"] .ico{background:var(--accent);color:var(--accent-ink)}
+.btn.soft{background:var(--accent2-soft);color:var(--accent2)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.link{color:var(--accent2)}
+.link.sutil{color:var(--muted)}
+.rcard,.card,.item,.series,.semana-card,.consejos,.entrada,.vacio,.plan-fila{box-shadow:none;border:1px solid var(--line)}
+.card{border-color:transparent;background:var(--surface)}
+.minis{background:var(--bg-2)}
+.figbox,.ficha-fig,.ent-fig{background:radial-gradient(120% 95% at 50% 28%,color-mix(in srgb,var(--z,var(--accent2)) 42%,var(--surface)),color-mix(in srgb,var(--z,var(--accent2)) 7%,var(--bg-2)) 74%)} /* foco de escenario detrás del maniquí */
+.hero .figbox{background:color-mix(in srgb,var(--accent) 16%,var(--surface))}
+.mas-n{background:var(--surface-2);color:var(--ink)}
+.tag{background:var(--accent-soft);color:var(--accent)}
+.tag.gris{background:var(--accent2-soft);color:var(--accent2)}
+.ojo{background:var(--accent2-soft)}
+.plan .ojo b{color:var(--accent2)}
+.aviso{background:var(--accent2-soft);border-color:var(--accent2)}
+.chips button{background:var(--surface);box-shadow:none;border:1px solid var(--line);display:inline-flex;align-items:center;gap:8px}
+.chips button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.zchip::before,.zona-tit::before,.tira-dot{content:"";width:12px;height:12px;border-radius:50%;background:var(--z);flex:none}
+.zona-tit{display:flex;align-items:center;gap:12px}
+.zona-tit::before{width:14px;height:14px}
+.card{--z:var(--accent2)}
+@media (hover:hover){.card:hover{box-shadow:0 10px 30px rgb(0 0 0 / .45);border-color:var(--line)}}
+.pick[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pick[aria-pressed="true"] .marca{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step button{background:var(--accent2-soft);color:var(--accent2)}
+.nombre,.buscar,.codigo,.serie input{background:var(--bg-2);border-color:var(--line)}
+.dia.on .bola{background:var(--accent);color:var(--accent-ink)}
+.dia.hoy .bola{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent2)}
+.bola{background:var(--surface-2)}
+.semana-mini{display:flex;gap:8px;margin-top:6px}
+.semana-mini .dia{gap:4px}
+.semana-mini .bola{width:40px;max-width:none;font-size:1rem}
+.chip-inline{background:var(--accent2-soft);color:var(--accent2)}
+.tira button{background:var(--surface);box-shadow:none;border:2px solid var(--line);display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center}
+.tira button small{grid-column:2}
+.tira button[aria-current="true"]{border-color:var(--accent);background:var(--surface-2)}
+.tira button.ok{background:var(--ok-soft);border-color:var(--ok-soft)}
+.serie.hecha{background:var(--ok-soft)}
+.serie.hecha input{background:var(--surface)}
+.check{background:var(--bg-2)}
+.descanso-bar{background:var(--accent2);color:var(--accent2-ink)}
+.d-prog{background:var(--accent)}
+.bar-btn{border-color:currentColor}
+.ses-top{background:var(--bg)}
+.sonido-btn[aria-pressed="true"]{color:var(--accent2)}
+.sonido-btn.compacto{background:var(--surface);box-shadow:none;border:1px solid var(--line)}
+.instalar{border-color:var(--accent2);background:var(--accent2-soft)}
+.consejos-lista .ico{color:var(--accent)}
+.plan-fila .ico{color:var(--accent)}
+.plan.resalta{box-shadow:0 0 0 3px var(--accent)}
+.sube button{background:var(--accent);color:var(--accent-ink)}
+.ok-txt{color:var(--accent)}
+dialog{background:var(--surface);border:1px solid var(--line)}
+dialog::backdrop{background:rgb(4 5 14 / .72)}
+.flot{background:var(--surface);border:1px solid var(--line);box-shadow:none}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}::-webkit-scrollbar-track{background:transparent}
+
 /* ---------- Tablet y pantallas grandes ---------- */
 @media (min-width:44rem){
   .hero{grid-template-columns:1fr 1fr;gap:40px}
@@ -364,7 +412,7 @@ dialog[open]::backdrop{animation:velo .32s ease-out}
 @media (min-width:1024px){
   body{padding-left:108px}
   .tabs{top:0;bottom:0;right:auto;width:108px;flex-direction:column;justify-content:flex-start;gap:8px;
-    padding:112px 10px 24px max(10px,env(safe-area-inset-left,0px));box-shadow:1px 0 0 var(--line)}
+    padding:112px 10px 24px max(10px,env(safe-area-inset-left,0px));box-shadow:1px 0 0 var(--line)!important}
   .tabs button{flex:none;min-height:80px}
   .top{position:fixed;top:24px;left:0;width:108px;justify-content:center;padding:0;z-index:41}
   .brand-txt{display:none}
@@ -552,7 +600,7 @@ function init3d(){
 // Los colores salen de los tokens CSS, así el maniquí sigue el tema claro u oscuro
 function tintar(){
   const cs=getComputedStyle(document.documentElement);
-  const key=['--wood','--joint','--prop','--floor','--mat','--ink'].map(n=>cs.getPropertyValue(n).trim()).join();
+  const key=['--wood','--joint','--prop','--floor','--mat','--db'].map(n=>cs.getPropertyValue(n).trim()).join();
   if(key===G.colors)return false;
   G.colors=key;const[w,j,p,f,m,i]=key.split(','),M=G.M;
   M.wood.color.setStyle(w);M.joint.color.setStyle(j);M.prop.color.setStyle(p);M.floor.color.setStyle(f);M.mat.color.setStyle(m);M.db.color.setStyle(i);
@@ -769,6 +817,8 @@ const EX=[
 EX.forEach(prep);
 const byId=Object.fromEntries(EX.map(e=>[e.id,e]));
 const ZONAS=['Piernas','Pecho','Espalda','Brazos','Hombros','Abdomen'];
+const ZCOL={Piernas:'#C6F432',Pecho:'#3DD9EB',Espalda:'#9D8FFF',Brazos:'#FF8A5C',Hombros:'#FFC23D',Abdomen:'#FF6FB5'};
+const zona=(e,ex)=>{e.style.setProperty('--z',ZCOL[ex.zona]);return e};
 const SUGERIDA=['silla','pared','remo','curl','puente','talones'];
 const QUIETO=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -858,7 +908,7 @@ function dosVeces(label,accion){
     setTimeout(()=>{armado=false;this.textContent=label},4000);
   }},label);
 }
-const figBox=(ex,o={})=>h('div',{class:'figbox'},figure(ex,{play:!QUIETO,e:QUIETO?HOLD+dur(ex)+.1:Math.random()*cycle(ex),...o}).node);
+const figBox=(ex,o={})=>zona(h('div',{class:'figbox'},figure(ex,{play:!QUIETO,e:QUIETO?HOLD+dur(ex)+.1:Math.random()*cycle(ex),...o}).node),ex);
 const minutos=(items,d=60)=>Math.max(1,Math.round(items.reduce((t,i)=>t+i.series*(i.reps*3+d),0)/60));
 const descTxt=s=>s<60?`${s} segundos`:s%60?`${Math.floor(s/60)} min y ${s%60} s`:plural(s/60,'minuto','minutos');
 const descCorto=s=>s<60?`${s} s`:`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} min`;
@@ -903,6 +953,15 @@ function avisoSesion(){
     h('div',{class:'row'},h('button',{class:'btn primary',type:'button',onclick:abrirSesion},'Continuar'),
       dosVeces('Descartarlo',()=>{S.sesion=null;save();render()})));
 }
+function semanaMini(){
+  const hoy=new Date(),lunes=new Date(hoy);lunes.setHours(0,0,0,0);lunes.setDate(lunes.getDate()-(lunes.getDay()+6)%7);
+  const hechos=new Set(S.historial.map(e=>new Date(e.t).toDateString()));
+  return h('div',{class:'semana-mini','aria-label':'Días entrenados esta semana'},['L','M','X','J','V','S','D'].map((l,i)=>{
+    const d=new Date(lunes);d.setDate(lunes.getDate()+i);
+    return h('div',{class:'dia'+(hechos.has(d.toDateString())?' on':'')+(d.toDateString()===hoy.toDateString()?' hoy':'')},
+      h('span',{class:'muted small'},l),h('span',{class:'bola'},d.getDate()));
+  }));
+}
 function saludo(){const hr=new Date().getHours();return hr>=6&&hr<14?'Buenos días':hr>=14&&hr<21?'Buenas tardes':'Buenas noches'}
 function vistaRutinas(){
   if(!S.rutinas.length)return h('div',{class:'stack'},avisoSesion(),h('section',{class:'hero'},
@@ -920,7 +979,8 @@ function vistaRutinas(){
     h('section',{class:'intro'},
       h('p',{class:'fecha'},cap(hoy.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'}))),
       h('h1',{},saludo()),
-      h('p',{class:'muted'},semana?`Esta semana llevas ${plural(semana,'entreno','entrenos')}. ¡Sigue así!`:'Esta semana aún no has entrenado. Elige una rutina y empieza cuando quieras.')),
+      h('p',{class:'muted'},semana?`Esta semana llevas ${plural(semana,'entreno','entrenos')}. ¡Sigue así!`:'Esta semana aún no has entrenado. Elige una rutina y empieza cuando quieras.'),
+      semanaMini()),
     avisoSesion(),
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
@@ -1077,8 +1137,8 @@ function vistaEjercicios(){
   return h('div',{class:'stack'},
     h('section',{class:'intro'},h('h1',{},'Ejercicios'),
       h('p',{class:'muted'},'Toca uno para ver cómo se hace. Todos se pueden hacer en casa, con una silla, una esterilla y mancuernas o botellas de agua.')),
-    h('div',{class:'salto'},h('nav',{class:'chips','aria-label':'Ir a una zona'},ZONAS.map((z,i)=>h('button',{type:'button',onclick:()=>document.getElementById('z'+i).scrollIntoView({behavior:QUIETO?'auto':'smooth'})},z)))),
-    ZONAS.map((z,i)=>h('section',{class:'zona',id:'z'+i},h('h2',{},z),h('div',{class:'grid'},EX.filter(e=>e.zona===z).map(tarjeta)))));
+    h('div',{class:'salto'},h('nav',{class:'chips','aria-label':'Ir a una zona'},ZONAS.map((z,i)=>zona(h('button',{type:'button',class:'zchip',onclick:()=>document.getElementById('z'+i).scrollIntoView({behavior:QUIETO?'auto':'smooth'})},z),{zona:z})))),
+    ZONAS.map((z,i)=>h('section',{class:'zona',id:'z'+i},zona(h('h2',{class:'zona-tit'},z),{zona:z}),h('div',{class:'grid'},EX.filter(e=>e.zona===z).map(tarjeta)))));
 }
 const tarjeta=ex=>h('button',{class:'card',type:'button',onclick:()=>ficha(ex)},
   figBox(ex),h('span',{class:'name'},ex.nombre),h('span',{class:'muted small'},ex.musculos));
@@ -1129,9 +1189,9 @@ function ficha(ex,o={}){
       estado);
   dlg.className='ancho';
   dlg.replaceChildren(h('div',{class:'ficha-grid'},
-    h('div',{class:'ficha-fig'},f.node,
+    zona(h('div',{class:'ficha-fig'},f.node,
       h('button',{class:'flot tr',type:'button',onclick:()=>dlg.close()},ico('cerrar'),'Cerrar'),
-      h('button',{class:'flot br',type:'button',onclick(){f.play=!f.play;this.textContent=f.play?'Pausar':'Seguir'}},'Pausar')),
+      h('button',{class:'flot br',type:'button',onclick(){f.play=!f.play;this.textContent=f.play?'Pausar':'Seguir'}},'Pausar')),ex),
     h('div',{class:'ficha-body'},
       h('h2',{},ex.nombre),h('p',{class:'muted'},ex.musculos+(G?'. Arrastra el muñeco para verlo desde otro lado.':'')),
       h('h3',{},'Cómo se hace'),h('ol',{class:'pasos'},ex.pasos.map(p=>h('li',{},p))),
@@ -1328,7 +1388,7 @@ function pintarSesion(){
   const ir=k=>{if(k!==E.i)sonar('pasar');E.i=k;save();pintarSesion()};
   reloj=h('span',{class:'reloj-ses'},reloj2((Date.now()-E.t0)/1000));
   const tira=h('div',{class:'tira'},E.items.map((s,k)=>{
-    const b=h('button',{type:'button','aria-current':String(k===E.i),onclick:()=>ir(k)},byId[s.id].nombre,h('small',{},contar(s)));
+    const b=zona(h('button',{type:'button','aria-current':String(k===E.i),onclick:()=>ir(k)},h('i',{class:'tira-dot'}),byId[s.id].nombre,h('small',{},contar(s))),byId[s.id]);
     b.classList.toggle('ok',s.sets.every(z=>z.done));return b;
   }));
   const f=figure(x,{db:x.db&&it.sets.some(z=>z.kg>0),girar:true});
@@ -1336,7 +1396,7 @@ function pintarSesion(){
     h('div',{class:'ses-top'},h('div',{class:'ses-tit'},h('b',{},E.nombre),reloj),
       h('div',{class:'ses-acc'},botonSonido(true),h('button',{class:'btn ghost',type:'button',onclick:terminar},'Terminar'))),
     tira,
-    h('div',{class:'ses-grid'},h('div',{class:'ses-demo'},h('div',{class:'ent-fig'},f.node),
+    h('div',{class:'ses-grid'},h('div',{class:'ses-demo'},zona(h('div',{class:'ent-fig'},f.node),x),
     h('div',{class:'ses-head'},h('h2',{},x.nombre),h('button',{class:'link',type:'button',onclick:()=>ficha(x,{solo:true})},'Cómo se hace'))),
     h('div',{class:'ses-sets'},
     h('div',{class:'series'},
