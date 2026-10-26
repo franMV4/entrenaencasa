@@ -151,6 +151,15 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-s
 .aviso{background:var(--accent-soft);box-shadow:none}
 .instalar{border:2px solid var(--line);box-shadow:none;background:transparent}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.planes-mini{display:grid;gap:10px}
+.plan-fila{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 16px;border:0;border-radius:var(--r);background:var(--surface);box-shadow:var(--sh-1);text-align:left}
+.plan-fila-txt{display:grid;gap:2px;flex:1;min-width:0}
+.plan-fila-txt .small{padding:0}
+.plan-fila .ico{color:var(--accent)}
+.plan{scroll-margin-top:16px}
+.plan.resalta{box-shadow:0 0 0 3px var(--accent),var(--sh-2)}
+@media (min-width:720px){.planes-mini{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:1024px){.planes-mini{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .tag{display:inline-flex;align-items:center;min-height:28px;padding:2px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.9rem;font-weight:700}
 .tag.gris{background:var(--bg-2);color:var(--muted)}
 .plan .ojo b{color:var(--accent)}
@@ -820,7 +829,7 @@ const ICOS={
   play:'M8 5.6v12.8a1 1 0 0 0 1.5.86l10.2-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z',
   editar:'M4 20h4.5L19.3 9.2a2.1 2.1 0 0 0 0-3l-1.5-1.5a2.1 2.1 0 0 0-3 0L4 15.5zM13.5 6l4.5 4.5',
   compartir:'M12 15V3.5M7.5 8 12 3.5 16.5 8M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13',
-  check:'M5 12.5l4.5 4.5L19 7.5',mas:'M12 5v14M5 12h14',menos:'M5 12h14',atras:'M15 5l-7 7 7 7',
+  check:'M5 12.5l4.5 4.5L19 7.5',mas:'M12 5v14M5 12h14',menos:'M5 12h14',atras:'M15 5l-7 7 7 7',adelante:'M9 5l7 7-7 7',
   reloj:'M12 7.5V12l3 2M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z',cerrar:'M6 6l12 12M18 6 6 18',subir:'M12 19V5M6 11l6-6 6 6',
   descargar:'M12 3.5V15M7.5 10.5 12 15l4.5-4.5M5 19.5h14',
   sonido:'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
@@ -902,7 +911,7 @@ function vistaRutinas(){
       h('h1',{},'Aún no tienes rutinas'),
       h('p',{class:'muted'},'Crea una eligiendo ejercicios, empieza con una sencilla ya preparada o pega el código que te hayan enviado.'),
       h('div',{class:'row'},
-        h('button',{class:'btn primary',type:'button',onclick(){nuevaRutina('Rutina suave',SUGERIDA.map(id=>({id,...byId[id].def})));render()}},'Usar la rutina sugerida'),
+        h('button',{class:'btn primary',type:'button',onclick:()=>show('planes')},ico('planes'),'Ver rutinas del entrenador'),
         h('button',{class:'btn ghost',type:'button',onclick:crear},'Crear una rutina')),
       h('div',{},h('button',{class:'link',type:'button',onclick:pegarCodigo},'Tengo un código')))));
   const hoy=new Date(),lunes=new Date(hoy);lunes.setHours(0,0,0,0);lunes.setDate(lunes.getDate()-(lunes.getDay()+6)%7);
@@ -916,6 +925,12 @@ function vistaRutinas(){
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
       h('div',{class:'rutinas'},S.rutinas.map(tarjetaRutina))),
+    h('section',{class:'stack-s'},
+      h('div',{class:'sec-head'},h('h2',{},'Rutinas del entrenador'),h('button',{class:'link',type:'button',onclick:()=>show('planes')},'Ver todas')),
+      h('p',{class:'muted'},'Preparadas para hacer en casa a partir de los 50 años. Toca una para verla y guardarla.'),
+      h('div',{class:'planes-mini'},PLANES.map(p=>h('button',{class:'plan-fila',type:'button',onclick:()=>verPlan(p.id)},
+        h('span',{class:'plan-fila-txt'},h('b',{},p.nombre),h('span',{class:'muted small'},`${p.nivel}, unos ${minutos(p.items.map(([id,series,reps])=>({id,series,reps})),p.descanso)} minutos`)),
+        ico('adelante'))))),
     avisoInstalar(),
     h('div',{class:'row pie-rut'},h('button',{class:'link',type:'button',onclick:pegarCodigo},'Tengo un código de rutina'),botonSonido()));
 }
@@ -1026,6 +1041,7 @@ const CONSEJOS=['Entrena 2 o 3 días por semana, con un día de descanso entre m
   'Cansancio en el músculo, sí; dolor en las articulaciones, no. Si algo duele, para.',
   'No aguantes la respiración: suelta el aire al hacer el esfuerzo y bebe agua.',
   'Si tienes una lesión, problemas de corazón o tensión alta, consulta antes con tu médico.'];
+function verPlan(id){show('planes');const a=document.getElementById('plan-'+id);if(a){a.classList.add('resalta');a.scrollIntoView({block:'start'})}}
 function vistaPlanes(){
   return h('div',{class:'stack'},
     h('section',{class:'intro'},h('h1',{},'Planes'),
@@ -1039,7 +1055,7 @@ function tarjetaPlan(p){
   const items=p.items.map(([id,series,reps,kg])=>({id,series,reps,kg})),n=items.length,muestra=n>4?items.slice(0,3):items;
   const estado=h('p',{class:'ok-txt','aria-live':'polite'});
   const guardar=()=>nuevaRutina(p.nombre,items.map(i=>({...i})),p.descanso);
-  return h('article',{class:'rcard plan'},
+  return h('article',{class:'rcard plan',id:'plan-'+p.id},
     h('div',{class:'minis','aria-hidden':'true'},muestra.map(i=>figBox(byId[i.id],{play:false,e:HOLD+dur(byId[i.id])+.1})),n>4&&h('span',{class:'mas-n'},`+${n-3}`)),
     h('div',{class:'rbody'},
       h('div',{class:'tags'},h('span',{class:'tag'},p.nivel),h('span',{class:'tag gris'},p.cuando)),
@@ -1381,7 +1397,11 @@ const suelta=window.top===window.self&&/^https?:$/.test(location.protocol);
 const instalada=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const esIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 let instalar=null;
-if(suelta&&'serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(suelta&&'serviceWorker'in navigator){
+  const habia=!!navigator.serviceWorker.controller;let recargado=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(habia&&!recargado){recargado=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+}
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();instalar=e;if(vista==='rutinas')render()});
 addEventListener('appinstalled',()=>{instalar=null;render()});
 function avisoInstalar(){

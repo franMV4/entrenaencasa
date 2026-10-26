@@ -1,11 +1,11 @@
 // EntrenaEnCasa: funciona sin conexión.
 // La página se pide primero a internet (así las novedades llegan al momento) y, si no hay, sale de lo guardado.
 // El resto (Three.js, fuentes, iconos) se sirve de lo guardado y se refresca por detrás.
-const CACHE = 'entrenaencasa-v2';
+const CACHE = 'entrenaencasa-v3';
 const BASE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(BASE.map(u => new Request(u, { cache: 'reload' })))));
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
@@ -15,7 +15,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request).then(r => {
+    // no-cache: pregunta siempre al servidor si hay versión nueva (GitHub Pages guarda 10 min)
+    e.respondWith(fetch(e.request.url, { cache: 'no-cache' }).then(r => {
       if (r.ok) { const copia = r.clone(); caches.open(CACHE).then(c => c.put('./index.html', copia)); }
       return r;
     }).catch(() => caches.match('./index.html')));
