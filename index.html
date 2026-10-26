@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;800&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&display=swap">
 <style>
 /* Misma identidad (gris azulado, cobalto, Atkinson, maniquí de madera) con más profundidad,
    navegación al alcance del pulgar y dos columnas en tablet. */
@@ -32,6 +33,7 @@
   --sh-btn:0 2px 4px rgb(0 0 0 / .3),0 8px 22px rgb(198 244 50 / .22);
   --r:18px; --r-s:12px; --nav-h:76px;
   --font:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --num:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif; /* cifras: ceros sin barra, muy legibles */
   color-scheme:dark;
 }
 
@@ -382,6 +384,10 @@ dialog{background:var(--surface);border:1px solid var(--line);box-shadow:none}
 dialog::backdrop{background:rgb(4 5 14 / .72)}
 .flot{background:var(--surface);border:1px solid var(--line);box-shadow:none}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}::-webkit-scrollbar-track{background:transparent}
+
+/* Cifras (kg, repeticiones, tiempos, días) en Lexend */
+.step output,.bola,.reloj-ses,.tira small,.serie .n,.serie input,.ant,.d-txt,.mas-n{font-family:var(--num);font-weight:600;letter-spacing:0}
+.serie input{font-size:1.25rem}
 
 /* ---------- Tablet y pantallas grandes ---------- */
 @media (min-width:44rem){
