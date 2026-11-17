@@ -416,6 +416,20 @@ dialog::backdrop{background:rgb(4 5 14 / .72)}
 }
 .d-luego{font-size:.95rem;font-weight:700;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .aviso .ses-prog{background:var(--bg-2)}
+.casa{font-size:1rem;color:var(--muted);text-align:left}
+.facil-tip{margin-top:10px;font-size:1rem}
+.facil-tip b{color:var(--accent)}
+.facil{width:100%;max-width:34rem;display:grid;gap:10px;text-align:left}
+.facil-fila{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.facil-fila .small{padding:0}
+.facil-fila .btn{min-height:48px;padding-inline:16px;font-size:1rem}
+.facil-fila .ok-txt{grid-column:1/-1;font-size:.95rem;min-height:0}
+.niveles{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.niveles li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start}
+.niveles .bola{width:44px;background:var(--accent);color:var(--accent-ink);font-family:var(--num)}
+.tabla-casa{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.tabla-casa li{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:10px}
+.tabla-casa b{font-family:var(--num);font-weight:600;color:var(--accent)}
 .empieza{border-color:var(--accent);background:linear-gradient(160deg,var(--accent-soft),var(--surface) 70%)}
 
 /* ---------- Tablet y pantallas grandes ---------- */
@@ -988,6 +1002,17 @@ function avisoSesion(){
     h('div',{class:'racts'},h('button',{class:'btn primary big',type:'button',onclick:()=>abrirSesion()},ico('play'),'Seguir entrenando')),
     h('div',{},dosVeces('Descartarlo',()=>{S.sesion=null;save();render()})));
 }
+// Tras unas semanas entrenando, propone la rutina del siguiente nivel (hasta que la guarde)
+function subeNivel(){
+  const n=S.historial.filter(e=>e.completa).length,tiene=id=>S.rutinas.some(r=>r.nombre===PLANES.find(p=>p.id===id).nombre);
+  const sig=n>=36&&!tiene('fuerza')?['fuerza',3,'«Fuerza a fondo», con menos repeticiones y más peso']
+    :n>=8&&!tiene('cuerpoA')&&!tiene('fuerza')?['cuerpoA',2,'«Cuerpo entero A» y «B», ya con peso (botellas, garrafas o mancuernas)']:null;
+  if(!sig)return null;
+  return h('article',{class:'rcard empieza'},
+    h('div',{class:'rbody'},h('h2',{},`¡Puedes pasar al nivel ${sig[1]}!`),
+      h('p',{},`Llevas ${n} entrenos completos. Si ya los terminas sin mucho esfuerzo, es buen momento para subir: ${sig[2]}.`)),
+    h('div',{class:'racts'},h('button',{class:'btn primary',type:'button',onclick:()=>verPlan(sig[0])},`Ver las rutinas de nivel ${sig[1]}`)));
+}
 function semanaMini(){
   const hoy=new Date(),lunes=new Date(hoy);lunes.setHours(0,0,0,0);lunes.setDate(lunes.getDate()-(lunes.getDay()+6)%7);
   const hechos=new Set(S.historial.map(e=>new Date(e.t).toDateString()));
@@ -1008,7 +1033,7 @@ function vistaRutinas(){
       h('p',{class:'muted'},semana?`Esta semana llevas ${plural(semana,'entreno','entrenos')}. ¡Sigue así!`
         :hay?'Esta semana aún no has entrenado. Elige una rutina y empieza cuando quieras.':'Esta semana aún no has entrenado. Empieza con una rutina del entrenador o crea la tuya.'),
       semanaMini()),
-    avisoSesion(),
+    avisoSesion(),subeNivel(),
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),hay&&h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
       hay?h('div',{class:'rutinas'},S.rutinas.map(tarjetaRutina))
@@ -1078,14 +1103,51 @@ function proximo(it,ex){
   if(ex.peso!==false)return it.reps<12?{reps:it.reps+1}:{kg:it.kg+(it.kg<5?.5:1),reps:8};
   return it.reps<15?{reps:it.reps+1}:it.series<4?{series:it.series+1}:null;
 }
+// Pesos que hay en cualquier casa, para quien no tiene mancuernas
+const CASA=[[.5,'una botella de agua de medio litro'],[1,'un brick de leche o un paquete de 1 kg de arroz'],[1.5,'una botella de agua de 1,5 litros'],
+  [2,'una botella de 2 litros'],[3,'dos botellas de 1,5 litros en una bolsa'],[4,'cuatro bricks de leche en una bolsa'],
+  [5,'una garrafa de agua de 5 litros'],[6,'una mochila con cuatro botellas de 1,5 litros'],[8,'una garrafa de 8 litros'],[9,'un pack de seis botellas de 1,5 litros']];
+const UNA=new Set(['goblet','puentepeso','pullover','nuca']); // se sujeta un solo peso con las dos manos
+const casa=(ex,kg)=>{
+  if(!(kg>0))return'';
+  const c=CASA.reduce((a,b)=>Math.abs(b[0]-kg)<Math.abs(a[0]-kg)?b:a),dos=ex.db&&!ex.db1&&!UNA.has(ex.id);
+  return`${kgTxt(kg)}${dos?' en cada mano':''}: ${c[0]===kg?'':'más o menos '}${c[1]}.`;
+};
+// Cuando ya no se puede subir más, se cambia por la versión más difícil del catálogo
+const PASA={silla:'sentadilla',sentadilla:'goblet',pared:'mesa',mesa:'rodillas',puente:'puentepeso'};
+// Cómo hacerlo más difícil sin cambiar de ejercicio
+const MAS={
+  sentadilla:'Baja en 3 segundos y aguanta 2 abajo. Después, sujeta una garrafa o una mochila contra el pecho.',
+  silla:'Usa una silla más baja, o sujeta una botella o una garrafa contra el pecho.',
+  zancada:'Lleva una botella o una garrafa en cada mano, o vuelve a la posición inicial sin apoyar el pie de atrás.',
+  puente:'Ponte una garrafa o una mochila sobre la cadera, o hazlo con una sola pierna apoyada.',
+  talones:'Hazlo con una sola pierna o con una mochila con libros a la espalda.',
+  pared:'Separa más los pies de la pared. Cuando hagas 15 seguidas, pasa a las flexiones en la mesa.',
+  mesa:'Usa un apoyo más bajo, como una silla firme contra la pared. Luego pasa a las flexiones de rodillas.',
+  rodillas:'Baja en 3 segundos hasta casi tocar el suelo con el pecho.',
+  fondos:'Adelanta más los pies o estira del todo las piernas.',
+  patgluteo:'Aguanta 2 segundos arriba y apóyate solo con la punta de los dedos.',
+  extrodilla:'Aguanta 3 segundos con la pierna estirada, o cuélgate del tobillo una bolsa con una botella.',
+  crunch:'Sujeta una botella contra el pecho o sube más despacio.',
+  rodillasup:'Estira un poco más las piernas al bajarlas, sin despegar la zona lumbar del suelo.',
+  superman:'Estira los brazos por delante y aguanta 2 segundos arriba.',
+  escalon:'Usa un escalón más alto o lleva una botella en cada mano.'};
+const masTxt=ex=>MAS[ex.id]||'Baja el peso despacio, contando 3 segundos, y haz una pausa de 1 segundo en la parte más dura. Si sigue siendo fácil, sube medio kilo.';
+// El siguiente paso para un ejercicio de una rutina: más repeticiones, más peso, otra serie o un ejercicio más difícil
+function subida(it,ex){
+  const n=proximo(it,ex);
+  if(n)return{n,txt:n.kg!=null?`${kgTxt(n.kg)} y ${n.reps} repeticiones`:n.reps!=null?`${n.reps} repeticiones`:`${n.series} series`,casa:n.kg!=null?casa(ex,n.kg):''};
+  const p=PASA[ex.id];
+  return p?{n:{id:p,...byId[p].def},txt:`«${byId[p].nombre}»`,casa:''}:null;
+}
 function sugerir(r,it,ex){
   const e=S.historial.find(x=>x.rid===r.id&&x.items.some(i=>i.id===it.id));
   const hecho=e&&e.completa&&e.items.find(i=>i.id===it.id);
   if(!hecho||hecho.sets.length<it.series||hecho.sets.some(z=>z.reps<it.reps||z.kg<it.kg))return null;
-  const n=proximo(it,ex);if(!n)return null;
-  const txt=n.kg!=null?`${kgTxt(n.kg)} y ${n.reps} repeticiones`:n.reps!=null?`${n.reps} repeticiones`:`${n.series} series`;
+  const s=subida(it,ex);if(!s)return null;
   return h('div',{class:'sube'},h('span',{class:'muted small'},'La última vez lo hiciste todo.'),
-    h('button',{type:'button',onclick(){Object.assign(it,n);save();render()}},`Subir a ${txt}`));
+    h('button',{type:'button',onclick(){Object.assign(it,s.n);save();render()}},`${s.n.id?'Pasar a':'Subir a'} ${s.txt}`),
+    s.casa&&h('span',{class:'muted small'},s.casa));
 }
 
 // ---------- Planes: rutinas de entrenador para personas de 50 años en adelante, en casa ----------
@@ -1112,6 +1174,10 @@ const PLANES=[
   objetivo:'Para quien ya lleva meses entrenando: menos repeticiones y más peso para seguir ganando fuerza y proteger los huesos.',
   consejo:'Antes de cada ejercicio haz una serie suave para calentar. Nunca sacrifiques la técnica por subir peso.',
   items:[['goblet',4,8,6],['rumano',4,8,6],['rodillas',3,8,0],['remo1',4,8,5],['escalon',3,10,2],['press',3,8,3]]},
+ {id:'fuerzaB',grupo:'Para seguir progresando',nombre:'Fuerza a fondo B',nivel:'Avanzado',cuando:'Alternando con «Fuerza a fondo»',descanso:90,
+  objetivo:'La pareja de «Fuerza a fondo»: zancadas con peso, puente cargado y flexiones de rodillas. Ideal con garrafas de 5 u 8 litros o una mochila cargada.',
+  consejo:'Una mochila con botellas de 1,5 litros es una pesa estupenda: cada botella suma kilo y medio. Pégala bien a la espalda o al pecho.',
+  items:[['zancada',3,10,3],['puentepeso',4,10,8],['rodillas',3,10,0],['remo',4,10,5],['presuelo',3,10,5],['fondos',3,10,0],['crunch',3,12,0]]},
  {id:'equilibrio',grupo:'Con un objetivo',nombre:'Piernas fuertes y equilibrio',nivel:'Todos los niveles',cuando:'2 días por semana',descanso:75,
   objetivo:'Para caminar con más seguridad, subir escaleras sin esfuerzo y prevenir caídas.',
   consejo:'Haz los ejercicios de pie junto a una silla o la encimera. Cuando te sientas firme, apóyate solo con la punta de los dedos.',
@@ -1135,6 +1201,22 @@ const CONSEJOS=['Entrena 2 o 3 días por semana, con un día de descanso entre m
   'Cansancio en el músculo, sí; dolor en las articulaciones, no. Si algo duele, para.',
   'No aguantes la respiración: suelta el aire al hacer el esfuerzo y bebe agua.',
   'Si tienes una lesión, problemas de corazón o tensión alta, consulta antes con tu médico.'];
+const NIVEL={'Iniciación':1,Base:2,Avanzado:3};
+function cartaNiveles(){
+  const n=(t,titulo,txt)=>h('li',{},h('span',{class:'bola'},t),h('div',{},h('b',{},titulo),h('p',{class:'muted'},txt)));
+  return h('section',{class:'consejos'},h('h2',{},'Cómo ir subiendo de nivel'),
+    h('ol',{class:'niveles'},
+      n(1,'Iniciación: «Primeros pasos» y «Exprés»','Las primeras 3 o 4 semanas, casi sin peso. Pasa al nivel 2 cuando hagas todas las series sin esfuerzo y sin dolor.'),
+      n(2,'Base: «Cuerpo entero A» y «B», alternas','De 2 a 6 meses. Ya con peso: botellas, bricks, garrafas o mancuernas. Pasa al nivel 3 cuando muevas unos 5 kg en la sentadilla con peso al pecho y en el remo.'),
+      n(3,'Avanzado: «Fuerza a fondo» y «Fuerza a fondo B»','Menos repeticiones y más peso, con garrafas de 5 u 8 litros o una mochila cargada.')),
+    h('p',{},'Dentro de cada rutina también se sube: al terminar, toca «Fácil, subir» en los ejercicios que no te costaron y la próxima vez serán un poco más duros.'));
+}
+function cartaCasa(){
+  return h('section',{class:'consejos'},h('h2',{},'Pesas que ya tienes en casa'),
+    h('p',{class:'muted'},'No hacen falta mancuernas. Llena botellas de agua o usa lo que tengas en la despensa:'),
+    h('ul',{class:'tabla-casa'},CASA.map(([kg,t])=>h('li',{},h('b',{},`${kgN(kg)} kg`),h('span',{},cap(t))))),
+    h('p',{class:'muted'},'Para más peso, mete botellas en una mochila: cada botella de 1,5 litros suma kilo y medio.'));
+}
 const planARutina=p=>nuevaRutina(p.nombre,p.items.map(([id,series,reps,kg])=>({id,series,reps,kg})),p.descanso);
 function verPlan(id){show('planes');const a=document.getElementById('plan-'+id);if(a){a.classList.add('resalta');a.scrollIntoView({block:'start'})}}
 function vistaPlanes(){
@@ -1143,6 +1225,7 @@ function vistaPlanes(){
       h('p',{class:'muted'},'Rutinas preparadas por un entrenador para hacer en casa a partir de los 50 años. Guarda la que te encaje y ajústala a tu gusto.')),
     h('section',{class:'consejos'},h('h2',{},'Antes de empezar'),
       h('ul',{class:'consejos-lista'},CONSEJOS.map(c=>h('li',{},ico('check'),h('span',{},c))))),
+    cartaNiveles(),cartaCasa(),
     GRUPOS_PLAN.map(g=>h('section',{class:'stack-s'},h('h2',{},g),
       h('div',{class:'rutinas'},PLANES.filter(p=>p.grupo===g).map(tarjetaPlan)))));
 }
@@ -1153,7 +1236,7 @@ function tarjetaPlan(p){
   return h('article',{class:'rcard plan',id:'plan-'+p.id},
     h('div',{class:'minis','aria-hidden':'true'},muestra.map(i=>figBox(byId[i.id],{play:false,e:HOLD+dur(byId[i.id])+.1})),n>4&&h('span',{class:'mas-n'},`+${n-3}`)),
     h('div',{class:'rbody'},
-      h('div',{class:'tags'},h('span',{class:'tag'},p.nivel),h('span',{class:'tag gris'},p.cuando)),
+      h('div',{class:'tags'},h('span',{class:'tag'},NIVEL[p.nivel]?`Nivel ${NIVEL[p.nivel]} · ${p.nivel}`:p.nivel),h('span',{class:'tag gris'},p.cuando)),
       h('h3',{class:'rname'},p.nombre),
       h('p',{},p.objetivo),
       h('p',{class:'meta'},ico('reloj'),h('span',{},`${plural(n,'ejercicio','ejercicios')}, unos ${minutos(items,p.descanso)} minutos. Descanso de ${descTxt(p.descanso)}.`))),
@@ -1172,6 +1255,7 @@ function vistaEjercicios(){
   return h('div',{class:'stack'},
     h('section',{class:'intro'},h('h1',{},'Ejercicios'),
       h('p',{class:'muted'},'Toca uno para ver cómo se hace. Todos se pueden hacer en casa, con una silla, una esterilla y mancuernas o botellas de agua.')),
+    cartaCasa(),
     h('div',{class:'salto'},h('nav',{class:'chips','aria-label':'Ir a una zona'},ZONAS.map((z,i)=>zona(h('button',{type:'button',class:'zchip',onclick:()=>document.getElementById('z'+i).scrollIntoView({behavior:QUIETO?'auto':'smooth'})},z),{zona:z})))),
     ZONAS.map((z,i)=>h('section',{class:'zona',id:'z'+i},zona(h('h2',{class:'zona-tit'},z),{zona:z}),h('div',{class:'grid'},EX.filter(e=>e.zona===z).map(tarjeta)))));
 }
@@ -1232,9 +1316,14 @@ function ficha(ex,o={}){
       h('h3',{},'Cómo se hace'),h('ol',{class:'pasos'},ex.pasos.map(p=>h('li',{},p))),
       h('p',{class:'ojo'},ex.ojo),
       h('h3',{},'Qué necesitas'),h('p',{},conTxt(ex)),
-      h('h3',{},'Cómo ir subiendo'),h('p',{},ex.peso===false
-        ?'Cuando hagas todas las series sin esfuerzo, suma una repetición. Al llegar a 15, añade una serie.'
-        :'Sube las repeticiones de una en una hasta 12. Cuando las hagas todas, sube el peso medio kilo y vuelve a 8. En tu rutina te propondré el siguiente paso después de cada entreno.'),
+      ex.peso!==false&&h('p',{class:'muted'},'¿Sin mancuernas? ',casa(ex,v.kg)||'Para empezar, una botella de agua de medio litro pesa medio kilo; una de 1,5 litros, kilo y medio.'),
+      h('h3',{},'Si te resulta fácil'),
+      h('ol',{class:'pasos'},
+        h('li',{},ex.peso===false?'Suma una repetición cada vez que hagas todas las series sin esfuerzo, hasta 15. Luego añade una serie.'
+          :'Suma una repetición cada vez, hasta 12. Después sube el peso medio kilo (otra botella pequeña, un brick de leche) y vuelve a 8.'),
+        h('li',{},masTxt(ex)),
+        PASA[ex.id]&&h('li',{},'Cuando lo domines, pasa a ',h('button',{class:'link',type:'button',onclick:()=>ficha(byId[PASA[ex.id]],{solo})},`«${byId[PASA[ex.id]].nombre}»`),'.')),
+      h('p',{class:'muted'},'Al terminar cada entreno, la app te pregunta qué te resultó fácil y lo sube por ti.'),
       !solo&&h('div',{class:'fields'},campos(v,ex,()=>{})),
       pie)));
   dlg.showModal();
@@ -1442,8 +1531,8 @@ function filaSerie(it,z,k,a,conPeso,tira){
         else{
           E.rest={until:Date.now()+d*1e3,total:d,luego:luego()};save();pintarDescanso(d);
           // ejercicio completo: pasa solo al siguiente que quede por hacer
-          const sig=E.items.findIndex((x,j)=>j>E.i&&x.sets.some(s=>!s.done));
-          if(todo&&sig>0){const i0=E.i;sigue=setTimeout(()=>{if(E&&E.i===i0&&it.sets.every(x=>x.done)){E.i=sig;save();pintarSesion(true)}},1100)}
+          const queda=x=>x.sets.some(s=>!s.done),sig=E.items.findIndex((x,j)=>j>E.i&&queda(x))>=0?E.items.findIndex((x,j)=>j>E.i&&queda(x)):E.items.findIndex(queda);
+          if(todo&&sig>=0){const i0=E.i;sigue=setTimeout(()=>{if(E&&E.i===i0&&it.sets.every(x=>x.done)){E.i=sig;save();pintarSesion(true)}},1100)}
         }
       }else{save();sonar('quitar')}
       pintarProg();
@@ -1462,9 +1551,11 @@ function pintarSesion(cambio){
   const f=figure(x,{db:x.db&&it.sets.some(z=>z.kg>0),girar:true});
   const grid=h('div',{class:'ses-grid'},h('div',{class:'ses-demo'},zona(h('div',{class:'ent-fig'},f.node),x),
     h('div',{class:'ses-head'},h('h2',{},x.nombre),h('span',{class:'muted small'},x.musculos)),
+    conPeso&&it.sets[0]&&it.sets[0].kg>0&&h('p',{class:'casa'},'Sin mancuernas: ',casa(x,it.sets[0].kg)),
     // la primera vez que se hace un ejercicio, las instrucciones salen abiertas
     h('details',{class:'como',open:!ant.length},h('summary',{},'Cómo se hace'),
       h('ol',{class:'pasos'},x.pasos.map(p=>h('li',{},p))),h('p',{class:'ojo'},x.ojo),
+      h('p',{class:'facil-tip'},h('b',{},'¿Demasiado fácil? '),masTxt(x)),
       h('button',{class:'link',type:'button',onclick:()=>ficha(x,{solo:true})},'Verlo en grande'))),
     h('div',{class:'ses-sets'},
     h('p',{class:'muted'},'Haz las repeticiones y, al acabar cada serie, toca ',h('b',{},'✓'),'. Luego descansa: la app te avisa.'),
@@ -1515,13 +1606,32 @@ function guardarSesion(completa){
   const plan=i=>r&&r.items.find(x=>x.id===i.id),ult=i=>i.sets[i.sets.length-1];
   const cambios=items.filter(i=>{const p=plan(i);return p&&(ult(i).kg!==p.kg||ult(i).reps!==p.reps||total[i.id]!==p.series)});
   const act=cambios.length>0&&h('button',{class:'btn ghost',type:'button',onclick(){
-    for(const i of cambios)Object.assign(plan(i),{kg:ult(i).kg,reps:ult(i).reps,series:Math.min(10,total[i.id])});
+    for(const i of cambios)if(plan(i)&&!subidos.has(i.id))Object.assign(plan(i),{kg:ult(i).kg,reps:ult(i).reps,series:Math.min(10,total[i.id])});
     save();act.textContent='Rutina actualizada';act.disabled=true;
   }},'Guardar los pesos de hoy en la rutina');
+  // «¿Qué te resultó fácil?»: un toque y la próxima vez ese ejercicio sube un paso (desde lo que hizo hoy)
+  const subidos=new Set(); // ya llevan lo de hoy + el paso siguiente; «Guardar los pesos de hoy» no los pisa
+  const completos=r?E.items.filter(i=>plan(i)&&i.sets.length&&i.sets.every(z=>z.done)):[];
+  const facil=completos.length>0&&h('section',{class:'facil'},
+    h('h3',{},'¿Algún ejercicio te ha resultado fácil?'),
+    h('p',{class:'muted'},'Tócalo y la próxima vez será un poco más duro. Si te ha costado, déjalo como está: vas bien.'),
+    completos.map(i=>{
+      const x=byId[i.id],hoy={series:Math.min(10,i.sets.length),reps:ult(i).reps,kg:ult(i).kg},s=subida(hoy,x);
+      if(!s)return null;
+      const nota=h('p',{class:'ok-txt','aria-live':'polite'});
+      return h('div',{class:'facil-fila'},
+        h('span',{},h('b',{},x.nombre),h('br'),h('span',{class:'muted small'},setsTxt(i.sets.map(({kg,reps})=>({kg,reps}))))),
+        h('button',{class:'btn soft',type:'button',onclick(){
+          const p=plan(i);if(!p)return;
+          Object.assign(p,hoy,s.n);subidos.add(i.id);save();sonar('pop');this.disabled=true;this.textContent='Subido';
+          nota.textContent=`La próxima vez: ${s.txt}.${s.casa?' '+s.casa:''}`;
+        }},'Fácil, subir'),nota);
+    }));
   ent.replaceChildren(h('div',{class:'wrap ent'},
     h('div',{class:'ent-fig'},figure(byId.press,{girar:true}).node),
     h('h2',{},completa?'¡Rutina terminada!':'Entreno guardado'),
     h('p',{},`${plural(series,'serie','series')} de ${plural(items.length,'ejercicio','ejercicios')} en ${plural(e.mins,'minuto','minutos')}. Bebe un poco de agua.`),
+    facil,
     act&&h('p',{class:'muted'},'Hoy has cambiado algún peso o alguna repetición respecto a la rutina.'),act,
     h('div',{class:'row center'},
       h('button',{class:'btn primary big',type:'button',onclick:cerrarSesion},'Volver a mis rutinas'),
