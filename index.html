@@ -385,6 +385,39 @@ dialog::backdrop{background:rgb(4 5 14 / .72)}
 .step output,.bola,.reloj-ses,.tira small,.serie .n,.serie input,.ant,.d-txt,.mas-n{font-family:var(--num);font-weight:600;letter-spacing:0}
 .serie input{font-size:1.25rem}
 
+/* ---------- Entreno más guiado ---------- */
+.ses-top .atras{width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.ses-tit{flex:1}
+.ses-tit .small{padding:0}
+.ses-tit .reloj-ses{font-size:inherit;font-weight:600}
+.ses-tit>*{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block!important}
+.ses-top{gap:10px}
+.ses-acc{gap:6px}
+.ses-acc .btn{padding-inline:14px;min-height:52px}
+.ses-prog{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.ses-prog i{display:block;height:100%;background:var(--accent);border-radius:inherit;transition:width .4s cubic-bezier(.16,1,.3,1)}
+/* la siguiente serie que toca, resaltada */
+.series>:nth-child(1 of .serie:not(.cab,.hecha)){box-shadow:inset 0 0 0 2px var(--accent)}
+.series>:nth-child(1 of .serie:not(.cab,.hecha)) .check{border-color:var(--accent);color:var(--accent)}
+.como{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0 16px;text-align:left}
+.como[open]{padding-bottom:14px}
+.como summary{cursor:pointer;min-height:52px;display:flex;align-items:center;color:var(--accent2);font-weight:700;list-style:none}
+.como summary::-webkit-details-marker{display:none}
+.como summary::after{content:"";width:9px;height:9px;margin-left:10px;border:solid currentColor;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translateY(-3px);transition:transform .2s}
+.como[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.como .ojo{margin-top:10px;font-size:1rem}
+.d-col{flex:1;display:grid;min-width:0}
+@media (max-width:560px){
+  .descanso-bar{flex-wrap:wrap;row-gap:10px}
+  .d-col{flex-basis:100%;grid-template-columns:auto 1fr;align-items:baseline;column-gap:12px}
+  .d-col .d-txt{font-size:1.4rem}
+  .d-luego{text-align:right}
+  .descanso-bar .bar-btn{flex:1}
+}
+.d-luego{font-size:.95rem;font-weight:700;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aviso .ses-prog{background:var(--bg-2)}
+.empieza{border-color:var(--accent);background:linear-gradient(160deg,var(--accent-soft),var(--surface) 70%)}
+
 /* ---------- Tablet y pantallas grandes ---------- */
 @media (min-width:720px){
   .wrap{max-width:62rem;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));padding-top:28px}
@@ -838,7 +871,7 @@ delete S.destino;
 // El historial antiguo guardaba series/reps/kg; ahora cada serie va con sus propios kg y reps
 S.historial.forEach(e=>e.items.forEach(i=>{if(!Array.isArray(i.sets))i.sets=Array.from({length:i.series||0},()=>({kg:i.kg||0,reps:i.reps||0}))}));
 if(S.sesion&&!(S.sesion.items||[]).every(i=>byId[i.id]))S.sesion=null;
-const save=()=>{S.historial.length=Math.min(S.historial.length,500);try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
+const save=()=>{S.historial.length=Math.min(S.historial.length,500);if(S.sesion)S.sesion.ult=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch{}};
 const rut=id=>S.rutinas.find(r=>r.id===id);
 function nuevaRutina(nombre,items=[],descanso=60){const r={id:uid(),nombre,items,descanso};S.rutinas.push(r);save();return r}
 
@@ -930,7 +963,8 @@ function resumen(r){
 const main=document.getElementById('main'),dlg=document.getElementById('ficha');
 const tabs={rutinas:document.getElementById('tab-rutinas'),planes:document.getElementById('tab-planes'),ejercicios:document.getElementById('tab-ejercicios'),historial:document.getElementById('tab-historial')};
 let vista='rutinas',editando=null;
-function show(v,id=null){vista=v;editando=id;render();try{history.replaceState(null,'','#'+v)}catch{}window.scrollTo(0,0)}
+const entrar=n=>{if(!QUIETO&&n.animate)n.animate([{transform:'translateY(10px)',opacity:.5},{transform:'none',opacity:1}],{duration:260,easing:'cubic-bezier(.16,1,.3,1)'})};
+function show(v,id=null){vista=v;editando=id;render();entrar(main);try{history.replaceState(history.state,'','#'+v)}catch{}window.scrollTo(0,0)}
 for(const[v,b]of Object.entries(tabs)){b.onclick=()=>show(v);b.prepend(ico(v))}
 document.getElementById('marca').append(ico('ejercicios'));
 function render(){
@@ -946,11 +980,13 @@ function hoja(...kids){dlg.className='';dlg.replaceChildren(h('div',{class:'fich
 function crear(){const r=nuevaRutina(`Rutina ${S.rutinas.length+1}`);show('rutinas',r.id);const i=document.getElementById('nombre-rutina');i&&i.select()}
 function avisoSesion(){
   const z=S.sesion;if(!z)return null;
+  const[hechas,total]=cuentaSeries(z);
   return h('article',{class:'rcard aviso'},
-    h('h2',{},'Tienes un entreno a medias'),
-    h('p',{class:'muted'},`${z.nombre}, empezado ${fecha(z.t0)} a las ${new Date(z.t0).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}.`),
-    h('div',{class:'row'},h('button',{class:'btn primary',type:'button',onclick:abrirSesion},'Continuar'),
-      dosVeces('Descartarlo',()=>{S.sesion=null;save();render()})));
+    h('div',{class:'rbody'},h('h2',{},'Tienes un entreno a medias'),
+      h('p',{class:'muted'},`${z.nombre}, empezado ${fecha(z.t0)} a las ${new Date(z.t0).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}. Llevas ${hechas} de ${plural(total,'serie','series')}: está todo guardado.`)),
+    h('div',{class:'ses-prog','aria-hidden':'true'},h('i',{style:`width:${hechas/total*100}%`})),
+    h('div',{class:'racts'},h('button',{class:'btn primary big',type:'button',onclick:()=>abrirSesion()},ico('play'),'Seguir entrenando')),
+    h('div',{},dosVeces('Descartarlo',()=>{S.sesion=null;save();render()})));
 }
 function semanaMini(){
   const hoy=new Date(),lunes=new Date(hoy);lunes.setHours(0,0,0,0);lunes.setDate(lunes.getDate()-(lunes.getDay()+6)%7);
@@ -976,12 +1012,13 @@ function vistaRutinas(){
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Mis rutinas'),hay&&h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Nueva rutina')),
       hay?h('div',{class:'rutinas'},S.rutinas.map(tarjetaRutina))
-        :h('article',{class:'rcard vacia'},
-          h('div',{class:'rbody'},h('h3',{class:'rname'},'Aún no tienes rutinas'),
-            h('p',{class:'muted'},'Guarda una de las rutinas del entrenador, crea la tuya eligiendo ejercicios o pega el código que te hayan enviado.')),
+        :h('article',{class:'rcard empieza'},
+          h('div',{class:'rbody'},h('h3',{class:'rname'},'¿Es tu primera vez?'),
+            h('p',{},`Empieza por «Primeros pasos»: seis ejercicios sencillos, con apoyo y sin peso, en unos ${minutos(PLANES[0].items.map(([id,series,reps])=>({id,series,reps})),PLANES[0].descanso)} minutos. La app te guía paso a paso.`)),
           h('div',{class:'racts'},
-            h('button',{class:'btn primary',type:'button',onclick:()=>show('planes')},ico('planes'),'Ver rutinas del entrenador'),
-            h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Crear una rutina')))),
+            h('button',{class:'btn primary big',type:'button',onclick:()=>empezar(planARutina(PLANES[0]))},ico('play'),'Empezar ahora'),
+            h('button',{class:'btn soft',type:'button',onclick:()=>show('planes')},ico('planes'),'Ver otras rutinas'),
+            h('button',{class:'btn soft',type:'button',onclick:crear},ico('mas'),'Crear la mía')))),
     h('section',{class:'stack-s'},
       h('div',{class:'sec-head'},h('h2',{},'Rutinas del entrenador'),h('button',{class:'link',type:'button',onclick:()=>show('planes')},'Ver todas')),
       h('p',{class:'muted'},'Preparadas para hacer en casa a partir de los 50 años. Toca una para verla y guardarla.'),
@@ -1098,6 +1135,7 @@ const CONSEJOS=['Entrena 2 o 3 días por semana, con un día de descanso entre m
   'Cansancio en el músculo, sí; dolor en las articulaciones, no. Si algo duele, para.',
   'No aguantes la respiración: suelta el aire al hacer el esfuerzo y bebe agua.',
   'Si tienes una lesión, problemas de corazón o tensión alta, consulta antes con tu médico.'];
+const planARutina=p=>nuevaRutina(p.nombre,p.items.map(([id,series,reps,kg])=>({id,series,reps,kg})),p.descanso);
 function verPlan(id){show('planes');const a=document.getElementById('plan-'+id);if(a){a.classList.add('resalta');a.scrollIntoView({block:'start'})}}
 function vistaPlanes(){
   return h('div',{class:'stack'},
@@ -1111,7 +1149,7 @@ function vistaPlanes(){
 function tarjetaPlan(p){
   const items=p.items.map(([id,series,reps,kg])=>({id,series,reps,kg})),n=items.length,muestra=n>4?items.slice(0,3):items;
   const estado=h('p',{class:'ok-txt','aria-live':'polite'});
-  const guardar=()=>nuevaRutina(p.nombre,items.map(i=>({...i})),p.descanso);
+  const guardar=()=>planARutina(p);
   return h('article',{class:'rcard plan',id:'plan-'+p.id},
     h('div',{class:'minis','aria-hidden':'true'},muestra.map(i=>figBox(byId[i.id],{play:false,e:HOLD+dur(byId[i.id])+.1})),n>4&&h('span',{class:'mas-n'},`+${n-3}`)),
     h('div',{class:'rbody'},
@@ -1284,7 +1322,7 @@ function entrada(e){
 // ---------- Entreno: series libres con kg, repeticiones y check; descanso al marcar ----------
 // La sesión vive en S.sesion y se guarda con cada cambio, así sobrevive a recargar o bloquear el móvil.
 const ent=document.getElementById('entreno');
-let E=null,ac=null,lock=null,tic=null,rest=null,reloj=null;
+let E=null,ac=null,lock=null,tic=null,reloj=null,prog=null,sigue=null; // el descanso va en E.rest, así sobrevive a salir y volver
 // Sonidos sintetizados con Web Audio (sin archivos): notas de campanilla [frecuencia Hz, inicio s, duración s]
 const SONIDOS={
   empezar:[[523,0],[659,.09],[784,.18],[1047,.27,.35]],
@@ -1321,6 +1359,9 @@ function botonSonido(compacto){
 }
 const reloj2=s=>{s=Math.max(0,Math.floor(s));const hh=Math.floor(s/3600),m=Math.floor(s/60)%60,ss=String(s%60).padStart(2,'0');return hh?`${hh}:${String(m).padStart(2,'0')}:${ss}`:`${m}:${ss}`};
 const contar=it=>`${it.sets.filter(z=>z.done).length}/${it.sets.length}`;
+const cuentaSeries=z=>[z.items.reduce((t,i)=>t+i.sets.filter(s=>s.done).length,0),Math.max(1,z.items.reduce((t,i)=>t+i.sets.length,0))];
+const pintarProg=()=>{if(prog&&E){const[a,b]=cuentaSeries(E);prog.style.width=`${a/b*100}%`}};
+const pedirLuz=()=>{try{navigator.wakeLock.request('screen').then(l=>{lock=l}).catch(()=>{})}catch{}};
 function anterior(id){const e=S.historial.find(x=>x.items.some(i=>i.id===id));return e?e.items.find(i=>i.id===id).sets:[]}
 function empezar(r){
   const nueva=()=>{
@@ -1333,69 +1374,100 @@ function empezar(r){
     h('div',{class:'row'},h('button',{class:'btn primary',type:'button',onclick(){dlg.close();abrirSesion()}},'Continuar el de antes'),
       h('button',{class:'btn ghost',type:'button',onclick(){dlg.close();nueva()}},'Empezar uno nuevo')));
 }
-function abrirSesion(){
+function abrirSesion(sonido=true){
   E=S.sesion;
-  sonar('empezar');
-  try{navigator.wakeLock.request('screen').then(l=>{lock=l}).catch(()=>{})}catch{}
+  if(E.rest&&E.rest.until<Date.now())E.rest=null; // un descanso que acabó mientras estaba fuera no vuelve a sonar
+  sonido&&sonar('empezar');
+  pedirLuz();
   ent.hidden=false;document.body.classList.add('modo-entreno');
   clearInterval(tic);tic=setInterval(latido,1000);
   pintarSesion();
 }
+// Cierra la pantalla del entreno; si no se ha terminado, S.sesion sigue guardada y el inicio ofrece seguir
 function cerrarSesion(){
-  clearInterval(tic);rest=null;pintarDescanso();
+  clearInterval(tic);clearTimeout(sigue);
   try{lock&&lock.release()}catch{}
-  lock=null;E=null;ent.hidden=true;document.body.classList.remove('modo-entreno');render();
+  lock=null;E=null;pintarDescanso();ent.hidden=true;document.body.classList.remove('modo-entreno');render();entrar(main);
+}
+function salirEntreno(){
+  const[hechas,total]=cuentaSeries(E);
+  hoja(h('h2',{},'¿Salir del entreno?'),
+    h('p',{},`No se pierde nada: llevas ${hechas} de ${plural(total,'serie','series')} y queda todo guardado. Cuando vuelvas, sigues justo donde lo dejaste.`),
+    h('div',{class:'racts'},
+      h('button',{class:'btn primary big',type:'button',onclick:()=>dlg.close()},'Seguir entrenando'),
+      h('button',{class:'btn ghost',type:'button',onclick(){dlg.close();cerrarSesion()}},'Salir, sigo luego')));
 }
 // Barra de descanso fija abajo; aparece al marcar una serie
-const dTxt=h('span',{class:'d-txt'}),dProg=h('i',{class:'d-prog'});
-const descBar=h('div',{class:'descanso-bar',hidden:true},dProg,dTxt,
-  h('button',{class:'bar-btn',type:'button','aria-label':'Quitar 15 segundos',onclick(){if(rest){rest.until-=15e3;latido()}}},'−15'),
-  h('button',{class:'bar-btn',type:'button','aria-label':'Añadir 15 segundos',onclick(){if(rest){rest.until+=15e3;rest.total+=15;latido()}}},'+15'),
-  h('button',{class:'bar-btn',type:'button',onclick(){rest=null;pintarDescanso()}},'Saltar'));
+const dTxt=h('span',{class:'d-txt'}),dLuego=h('span',{class:'d-luego'}),dProg=h('i',{class:'d-prog'});
+const descBar=h('div',{class:'descanso-bar',hidden:true,role:'timer'},dProg,h('span',{class:'d-col'},dTxt,dLuego),
+  h('button',{class:'bar-btn',type:'button','aria-label':'Quitar 15 segundos',onclick(){if(E&&E.rest){E.rest.until-=15e3;save();latido()}}},'−15'),
+  h('button',{class:'bar-btn',type:'button','aria-label':'Añadir 15 segundos',onclick(){if(E&&E.rest){E.rest.until+=15e3;E.rest.total+=15;save();latido()}}},'+15'),
+  h('button',{class:'bar-btn',type:'button',onclick(){if(E){E.rest=null;save()}pintarDescanso()}},'Saltar'));
 function pintarDescanso(left){
+  const rest=E&&E.rest;
   descBar.hidden=!rest;if(!rest)return;
   left=Math.max(0,left??Math.ceil((rest.until-Date.now())/1000));
-  dTxt.textContent=`Descanso ${reloj2(left)}`;dProg.style.width=`${left/rest.total*100}%`;
+  dTxt.textContent=`Descansa ${reloj2(left)}`;dLuego.textContent=rest.luego||'';dProg.style.width=`${left/rest.total*100}%`;
 }
 function latido(){
   if(!E)return;
   if(reloj)reloj.textContent=reloj2((Date.now()-E.t0)/1000);
-  if(rest){const left=Math.ceil((rest.until-Date.now())/1000);if(left<=0){rest=null;sonar('descanso');vibrar([120,80,120])}pintarDescanso(left)}
+  if(E.rest){const left=Math.ceil((E.rest.until-Date.now())/1000);if(left<=0){E.rest=null;save();sonar('descanso');vibrar([120,80,120])}pintarDescanso(left)}
+}
+// Qué toca después de esta serie, para que se vea durante el descanso
+function luego(){
+  const it=E.items[E.i],k=it.sets.findIndex(z=>!z.done);
+  if(k>=0)return`Luego: serie ${k+1} de ${it.sets.length}`;
+  const sig=E.items.slice(E.i+1).concat(E.items.slice(0,E.i)).find(x=>x.sets.some(z=>!z.done));
+  return sig?`Luego: ${byId[sig.id].nombre}`:'¡Era la última serie!';
 }
 function filaSerie(it,z,k,a,conPeso,tira){
   const kg=conPeso&&h('input',{type:'number',inputmode:'decimal',step:'0.5',min:'0',max:'200',value:z.kg,'aria-label':`Kilos de la serie ${k+1}`,
-    oninput(){z.kg=num(parseFloat(this.value.replace(',','.')),0,200,0);save()}});
+    onfocus(){this.select()},oninput(){z.kg=num(parseFloat(this.value.replace(',','.')),0,200,0);save()}});
   const reps=h('input',{type:'number',inputmode:'numeric',min:'0',max:'200',value:z.reps,'aria-label':`Repeticiones de la serie ${k+1}`,
-    oninput(){z.reps=num(parseInt(this.value,10),0,200,0);save()}});
+    onfocus(){this.select()},oninput(){z.reps=num(parseInt(this.value,10),0,200,0);save()}});
   const fila=h('div',{class:'serie'+(conPeso?'':' sinpeso')+(z.done?' hecha':'')},
     h('span',{class:'n'},k+1),
     a?h('button',{class:'ant',type:'button','aria-label':`Usar lo de la última vez: ${serieTxt(a)}`,onclick(){
         z.reps=a.reps;reps.value=a.reps;if(kg){z.kg=a.kg;kg.value=a.kg}save()}},serieTxt(a)):h('span',{class:'ant'},'—'),
     kg,reps,
     h('button',{class:'check',type:'button','aria-pressed':String(z.done),'aria-label':`Serie ${k+1} hecha`,onclick(){
-      z.done=!z.done;fila.classList.toggle('hecha',z.done);this.setAttribute('aria-pressed',String(z.done));save();
-      const b=tira.children[E.i];b.querySelector('small').textContent=contar(it);b.classList.toggle('ok',it.sets.every(x=>x.done));
-      if(z.done){const d=E.descanso||60;rest={until:Date.now()+d*1e3,total:d};pintarDescanso(d);sonar(it.sets.every(x=>x.done)?'ejercicio':'hecha');vibrar(30)}
-      else sonar('quitar');
+      z.done=!z.done;fila.classList.toggle('hecha',z.done);this.setAttribute('aria-pressed',String(z.done));
+      const b=tira.children[E.i],todo=it.sets.every(x=>x.done);b.querySelector('small').textContent=contar(it);b.classList.toggle('ok',todo);
+      clearTimeout(sigue);
+      if(z.done){
+        const[hechas,total]=cuentaSeries(E),d=E.descanso||60;
+        sonar(todo?'ejercicio':'hecha');vibrar(30);
+        if(hechas===total){E.rest=null;save();sigue=setTimeout(terminar,900)} // todo hecho: ofrece guardar
+        else{
+          E.rest={until:Date.now()+d*1e3,total:d,luego:luego()};save();pintarDescanso(d);
+          // ejercicio completo: pasa solo al siguiente que quede por hacer
+          const sig=E.items.findIndex((x,j)=>j>E.i&&x.sets.some(s=>!s.done));
+          if(todo&&sig>0){const i0=E.i;sigue=setTimeout(()=>{if(E&&E.i===i0&&it.sets.every(x=>x.done)){E.i=sig;save();pintarSesion(true)}},1100)}
+        }
+      }else{save();sonar('quitar')}
+      pintarProg();
     }},ico('check')));
   return fila;
 }
-function pintarSesion(){
+function pintarSesion(cambio){
   const it=E.items[E.i],x=byId[it.id],ant=anterior(it.id),conPeso=x.peso!==false;
-  const ir=k=>{if(k!==E.i)sonar('pasar');E.i=k;save();pintarSesion()};
+  const ir=k=>{clearTimeout(sigue);if(k!==E.i)sonar('pasar');const c=k!==E.i;E.i=k;save();pintarSesion(c)};
   reloj=h('span',{class:'reloj-ses'},reloj2((Date.now()-E.t0)/1000));
+  prog=h('i');
   const tira=h('div',{class:'tira'},E.items.map((s,k)=>{
     const b=zona(h('button',{type:'button','aria-current':String(k===E.i),onclick:()=>ir(k)},h('i',{class:'tira-dot'}),byId[s.id].nombre,h('small',{},contar(s))),byId[s.id]);
     b.classList.toggle('ok',s.sets.every(z=>z.done));return b;
   }));
   const f=figure(x,{db:x.db&&it.sets.some(z=>z.kg>0),girar:true});
-  ent.replaceChildren(h('div',{class:'wrap ses'},
-    h('div',{class:'ses-top'},h('div',{class:'ses-tit'},h('b',{},E.nombre),reloj),
-      h('div',{class:'ses-acc'},botonSonido(true),h('button',{class:'btn ghost',type:'button',onclick:terminar},'Terminar'))),
-    tira,
-    h('div',{class:'ses-grid'},h('div',{class:'ses-demo'},zona(h('div',{class:'ent-fig'},f.node),x),
-    h('div',{class:'ses-head'},h('h2',{},x.nombre),h('button',{class:'link',type:'button',onclick:()=>ficha(x,{solo:true})},'Cómo se hace'))),
+  const grid=h('div',{class:'ses-grid'},h('div',{class:'ses-demo'},zona(h('div',{class:'ent-fig'},f.node),x),
+    h('div',{class:'ses-head'},h('h2',{},x.nombre),h('span',{class:'muted small'},x.musculos)),
+    // la primera vez que se hace un ejercicio, las instrucciones salen abiertas
+    h('details',{class:'como',open:!ant.length},h('summary',{},'Cómo se hace'),
+      h('ol',{class:'pasos'},x.pasos.map(p=>h('li',{},p))),h('p',{class:'ojo'},x.ojo),
+      h('button',{class:'link',type:'button',onclick:()=>ficha(x,{solo:true})},'Verlo en grande'))),
     h('div',{class:'ses-sets'},
+    h('p',{class:'muted'},'Haz las repeticiones y, al acabar cada serie, toca ',h('b',{},'✓'),'. Luego descansa: la app te avisa.'),
     h('div',{class:'series'},
       h('div',{class:'serie cab'+(conPeso?'':' sinpeso'),'aria-hidden':'true'},h('span',{},'Nº'),h('span',{},'Antes'),conPeso&&h('span',{},'kg'),h('span',{},'Reps'),h('span',{},'Hecha')),
       it.sets.map((z,k)=>filaSerie(it,z,k,ant[k],conPeso,tira))),
@@ -1406,10 +1478,19 @@ function pintarSesion(){
       E.i>0&&h('button',{class:'btn ghost',type:'button',onclick:()=>ir(E.i-1)},'Anterior'),
       E.i<E.items.length-1
         ?h('button',{class:'btn primary',type:'button',onclick:()=>ir(E.i+1)},`Siguiente: ${byId[E.items[E.i+1].id].nombre}`)
-        :h('button',{class:'btn primary',type:'button',onclick:terminar},'Terminar entreno'))))),
+        :h('button',{class:'btn primary',type:'button',onclick:terminar},'Terminar entreno')),
+    h('div',{},botonSonido())));
+  ent.replaceChildren(h('div',{class:'wrap ses'},
+    h('div',{class:'ses-top'},
+      h('button',{class:'atras',type:'button','aria-label':'Salir del entreno (se guarda)',onclick:salirEntreno},ico('atras')),
+      h('div',{class:'ses-tit'},h('b',{},E.nombre),h('span',{class:'muted small'},`Ejercicio ${E.i+1} de ${E.items.length} · `,reloj)),
+      h('div',{class:'ses-acc'},h('button',{class:'btn ghost',type:'button',onclick:terminar},'Terminar'))),
+    h('div',{class:'ses-prog','aria-hidden':'true'},prog),
+    tira,grid),
     descBar);
-  pintarDescanso();
+  pintarProg();pintarDescanso();
   ent.scrollTop=0;
+  if(cambio)entrar(grid);
   tira.children[E.i].scrollIntoView({block:'nearest',inline:'center'});
 }
 function terminar(){
@@ -1426,7 +1507,7 @@ function guardarSesion(completa){
   const e={t:E.t0,rid:E.rid,nombre:E.nombre,mins:Math.min(240,Math.max(1,Math.round((Date.now()-E.t0)/6e4))),completa,items};
   S.historial.unshift(e);S.sesion=null;save();
   sonar(completa?'fin':'guardado');
-  clearInterval(tic);rest=null;pintarDescanso();
+  clearInterval(tic);clearTimeout(sigue);E.rest=null;pintarDescanso();
   const r=rut(e.rid),series=items.reduce((t,i)=>t+i.sets.length,0);
   // Como en Chuzado: si cambió pesos o repeticiones, ofrece guardarlos en la rutina
   // Las series cuentan todas las de la sesión (también las añadidas), no solo las marcadas
@@ -1473,9 +1554,26 @@ function avisoInstalar(){
   return null;
 }
 
+// ---------- Botón «atrás» del móvil ----------
+// Con cada toque se deja una entrada de más en el historial; al pulsar atrás se cierra lo que haya abierto
+// (hoja, entreno, editor o pestaña) en vez de salir de la web. Solo en el inicio, atrás sale de verdad.
+// ponytail: no se vuelve a meter la entrada dentro de popstate (Chrome se saltaría la página al no haber toque);
+// si alguien pulsa atrás dos veces seguidas y sale, el entreno se reabre solo al volver (ver Arranque).
+addEventListener('click',()=>{try{if(!(history.state&&history.state.g))history.pushState({g:1},'')}catch{}},true);
+addEventListener('popstate',()=>{
+  if(dlg.open)dlg.close();
+  else if(E)S.sesion?salirEntreno():cerrarSesion();
+  else if(editando||vista!=='rutinas')show('rutinas');
+  else history.back();
+});
+// Al volver a la app: pantalla encendida otra vez y descanso al día
+document.addEventListener('visibilitychange',()=>{if(E&&document.visibilityState==='visible'){pedirLuz();latido()}});
+
 // ---------- Arranque ----------
 const hs=location.hash.slice(1);
 if(['planes','ejercicios','historial'].includes(hs))vista=hs;
 render();
 if(hs.startsWith('r-')){try{history.replaceState(null,'','#rutinas')}catch{}ofrecerImport(leerCodigo('#'+hs))}
+// Entreno a medias de las últimas horas: se vuelve directamente a él
+else if(S.sesion&&Date.now()-(S.sesion.ult||S.sesion.t0)<6*36e5)abrirSesion(false);
 </script>
