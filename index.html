@@ -1237,12 +1237,6 @@ const PLANES=[
   consejo:'Suelta el aire al subir. Si notas tirones en el cuello, apoya la cabeza y haz menos recorrido.',
   items:[['crunch',3,10,0],['rodillasup',3,10,0],['superman',3,8,0],['puente',3,12,0]]}];
 const GRUPOS_PLAN=['Para empezar','Para seguir progresando','Con un objetivo'];
-const CONSEJOS=['Entrena 2 o 3 días por semana, con un día de descanso entre medias.',
-  'Calienta 5 minutos antes: marcha en el sitio y haz círculos con los hombros y los tobillos.',
-  'La última repetición de cada serie debe costar, pero tienes que poder hacerla bien.',
-  'Cansancio en el músculo, sí; dolor en las articulaciones, no. Si algo duele, para.',
-  'No aguantes la respiración: suelta el aire al hacer el esfuerzo y bebe agua.',
-  'Si tienes una lesión, problemas de corazón o tensión alta, consulta antes con tu médico.'];
 const NIVEL={'Iniciación':1,Base:2,Avanzado:3};
 function cartaNiveles(){
   const n=(t,titulo,txt)=>h('li',{},h('span',{class:'bola'},t),h('div',{},h('b',{},titulo),h('p',{class:'muted'},txt)));
@@ -1265,9 +1259,7 @@ function vistaPlanes(){
   return h('div',{class:'stack'},
     h('section',{class:'intro'},h('h1',{},'Planes'),
       h('p',{class:'muted'},'Rutinas preparadas por un entrenador para hacer en casa a partir de los 50 años. Guarda la que te encaje y ajústala a tu gusto.')),
-    h('section',{class:'consejos'},h('h2',{},'Antes de empezar'),
-      h('ul',{class:'consejos-lista'},CONSEJOS.map(c=>h('li',{},ico('check'),h('span',{},c))))),
-    cartaNiveles(),cartaCasa(),
+    cartaNiveles(),
     GRUPOS_PLAN.map(g=>h('section',{class:'stack-s'},h('h2',{},g),
       h('div',{class:'rutinas'},PLANES.filter(p=>p.grupo===g).map(tarjetaPlan)))));
 }
